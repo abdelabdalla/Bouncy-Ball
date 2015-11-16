@@ -4,23 +4,28 @@ import javax.swing.*;
 
 import org.parse4j.Parse;
 
-
 public class Frame {
-public static void main (String[] args){
-	
-	String name = JOptionPane.showInputDialog("Please enter your username", JOptionPane.PLAIN_MESSAGE);//gets user's name
-	
-	JFrame frame = new JFrame();//initialises JFrame
-	Main panel = new Main(name);//initialises JPanel
-	frame.setSize(1280, 720);//sets frame size
-	frame.setLocationRelativeTo(null);
-	frame.setTitle("Bouncy Box");
-	frame.add(panel);
-	frame.setVisible(true);
-	frame.setResizable(false);
-	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	Parse.initialize("OsBlnIJZzv1diW5vNr9nn2zlJqmK5Rhj75R5qf6t", "LvYemJh5dyfb4pZ9PYmgzTJRNIB7TkFXQ1NMnt1V");//connects to database
-	
-	
-}
+	public static void main(String[] args) {
+
+		String name = JOptionPane.showInputDialog("Please enter your username", JOptionPane.PLAIN_MESSAGE);// gets
+																											// user's
+																											// name
+		if (name == null || (name != null && ("".equals(name)))) {//If cancel option is pressed
+			System.exit(0);//Close program
+		}
+
+		JFrame frame = new JFrame();// initialises JFrame
+		Main panel = new Main(name);// initialises JPanel
+		frame.setSize(1280, 720);// sets frame size
+		frame.setLocationRelativeTo(null);
+		frame.setTitle("Bouncy Box");
+		frame.add(panel);
+		frame.setVisible(true);
+		frame.setResizable(false);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		Parse.initialize("OsBlnIJZzv1diW5vNr9nn2zlJqmK5Rhj75R5qf6t", "LvYemJh5dyfb4pZ9PYmgzTJRNIB7TkFXQ1NMnt1V");// connects
+																													// to
+																													// database
+
+	}
 }
