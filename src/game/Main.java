@@ -232,7 +232,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.setFont(new Font("Arial", Font.PLAIN, 45));
 			g.drawString("You lose!", 545, 250);
 			g.drawString("Local High Score: " + Integer.toString(highScore), 450, 300);
-			g.drawString("Press space to retry or esc to exit", 295, 350);
+			g.drawString("Press enter to retry or esc to exit", 295, 350);
 			score = 0;
 
 		}
@@ -335,7 +335,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 		if (gameOver) {
 
-			if (c == KeyEvent.VK_SPACE) {
+			if (c == KeyEvent.VK_ENTER) {
 				timer.start();
 
 				score = 0;
