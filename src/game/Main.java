@@ -73,7 +73,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	public Main(String name) {
 		playerName = name;
 
-		for (int i = 0; i < 10; i += 2) { // initalise y axis for pipes
+		for (int i = 0; i < 10; i += 2) { // Initialise y axis for pipes
 			pipeY[i] = rand.nextInt(600) - 600;
 			pipeY[i + 1] = pipeY[i] + pipeGap;
 		}
@@ -341,11 +341,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			scoreLabel.setText(Integer.toString(score));
 		}
 		if (gameOver) {
-			
 
 			if (c == KeyEvent.VK_SPACE) {
 				timer.start();
-				
+
 				score = 0;
 				scoreLabel.setText(Integer.toString(score));
 				gameOver = false;
