@@ -38,7 +38,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	private static final long serialVersionUID = 1L;
 
 	JLabel scoreLabel = new JLabel();
-	Timer timer = new Timer(10, this);
+	Timer timer = new Timer(13, this);
 	Random rand = new Random();
 
 	int score = 0;
@@ -46,8 +46,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int xPos = 615;
 	int pipe1X = 1280;
 	int distPipes = 300;
-	int[] pipeX = { pipe1X, pipe1X + distPipes, pipe1X + (2 * distPipes),
-			pipe1X + (3 * distPipes), pipe1X + (4 * distPipes) };
+	int[] pipeX = { pipe1X, pipe1X + distPipes, pipe1X + (2 * distPipes), pipe1X + (3 * distPipes),
+			pipe1X + (4 * distPipes) };
 	int[] pipeY = new int[10];
 	int pipeGap = 635;
 	int pipeSpeed = -2;
@@ -96,7 +96,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		setFocusable(true);
 		add(scoreLabel);
 
-		// music();
+		//music();
 	}
 
 	public void paintComponent(final Graphics g) {
@@ -104,10 +104,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		Rectangle o1 = new Rectangle((int) xPos, (int) yPos, 35, 35);
 
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		super.paintComponent(g2d);
 
 		for (int i = 0; i < 10; i += 2) { // initialise pipe y axis
@@ -136,11 +134,12 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.fillRect(p.x, p.y, p.width, p.height);
 		}
 
-		g.setColor(new Color(48, 179, 255));
-		if (gameStarted == true) {
+		
+		if (gameStarted) {
 			g.setColor(Color.YELLOW);
+			g.fillRect(o1.x, o1.y, o1.width, o1.height);
 		}
-		g.fillRect(o1.x, o1.y, o1.width, o1.height);
+		
 
 		if (gameStarted == false && highScore != 0) { // at start
 			g.setColor(Color.RED);
@@ -157,12 +156,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.drawString("Don't touch the ground", 385, 350);
 			g.drawString("Press space to begin", 420, 400);
 		}
-		if (o1.intersects(pipe[0])
-				|| o1.intersects(pipe[1])
-				|| o1.intersects(pipe[2])
-				|| o1.intersects(pipe[3]) // hit detection
-				|| o1.intersects(pipe[4]) || o1.intersects(pipe[5])
-				|| o1.intersects(pipe[6]) || o1.intersects(pipe[7])
+		if (o1.intersects(pipe[0]) || o1.intersects(pipe[1]) || o1.intersects(pipe[2]) || o1.intersects(pipe[3]) // hit
+																													// detection
+				|| o1.intersects(pipe[4]) || o1.intersects(pipe[5]) || o1.intersects(pipe[6]) || o1.intersects(pipe[7])
 				|| o1.intersects(pipe[8]) || o1.intersects(pipe[9])) {
 			timer.stop();
 			gameOver = true;
@@ -172,6 +168,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial ", Font.PLAIN, 45));
 			g.drawString("Paused", 545, 250);
+			g.drawString("Press enter to carry on", 420, 300);
+			timer.stop();
 		}
 
 		if (gameOver) { // at game end
@@ -209,9 +207,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 								e1.printStackTrace();
 							}
 						} else {
-							System.out.println("Highscore: "
-									+ ob.getInt("Score") + " by "
-									+ ob.getString("User"));
+							System.out.println("Highscore: " + ob.getInt("Score") + " by " + ob.getString("User"));
 						}
 					}
 				}
@@ -233,10 +229,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			}
 
 			g.setColor(Color.RED);
-			g.setFont(new Font("Arial ", Font.PLAIN, 45));
+			g.setFont(new Font("Arial", Font.PLAIN, 45));
 			g.drawString("You lose!", 545, 250);
-			g.drawString("Local High Score: " + Integer.toString(highScore),
-					500, 300);
+			g.drawString("Local High Score: " + Integer.toString(highScore), 450, 300);
 			g.drawString("Press space to retry or esc to exit", 295, 350);
 			score = 0;
 
@@ -300,8 +295,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			@Override
 			public void run() {
 				try {
-					AudioInputStream is = AudioSystem
-							.getAudioInputStream(soundFile);
+					AudioInputStream is = AudioSystem.getAudioInputStream(soundFile);
 					Clip clip = AudioSystem.getClip();
 					clip.open(is);
 					clip.loop(Clip.LOOP_CONTINUOUSLY);
@@ -317,14 +311,13 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	public void keyPressed(KeyEvent e) {
 		int c = e.getKeyCode();
 		if (c == KeyEvent.VK_SPACE) {
-			yVelocity = -8;
+			yVelocity = -7;
 
 			if (yPos <= 100) {
 				yVelocity = -4;
 			}
 		}
 		if (c == KeyEvent.VK_ESCAPE) {
-			timer.stop();
 			gamePaused = true;
 		}
 		if (gamePaused) {

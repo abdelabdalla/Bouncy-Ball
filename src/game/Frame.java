@@ -8,10 +8,10 @@ import org.parse4j.Parse;
 public class Frame {
 public static void main (String[] args){
 	
-	String name = JOptionPane.showInputDialog("Yo name brah", JOptionPane.PLAIN_MESSAGE);//gets user's name
+	String name = JOptionPane.showInputDialog("Please enter your username", JOptionPane.PLAIN_MESSAGE);//gets user's name
 	
-	JFrame frame = new JFrame();//initialises jframe
-	Main panel = new Main(name);//initialises jpanel
+	JFrame frame = new JFrame();//initialises JFrame
+	Main panel = new Main(name);//initialises JPanel
 	frame.setSize(1280, 720);//sets frame size
 	frame.setLocationRelativeTo(null);
 	frame.setTitle("Bouncy Box");
