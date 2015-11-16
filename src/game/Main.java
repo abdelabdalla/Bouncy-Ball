@@ -21,7 +21,6 @@ import java.util.Random;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -37,7 +36,6 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	JLabel scoreLabel = new JLabel();
 	Timer timer = new Timer(13, this);
 	Random rand = new Random();
 
@@ -54,9 +52,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int clear = 1305;
 	int clearIntersectPoint = 640;
 	int highScore;
-	int cloudX = 20;
-	int cloudY = rand.nextInt(100);
-
+	
+	double cloudX = 20;
+	double cloudY = rand.nextInt(100) + 40;
 	double terminalVelocity = 18.0;
 	double gravity = 0.34;
 	double yVelocity = 0.0;
@@ -66,8 +64,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	boolean gameStarted = false;
 	boolean gamePaused = false;
 
-	File soundFile = new File("loop1.wav");
-
+	File pointSFX = new File("Cleared.wav");
+	
 	String playerName;
 
 	public Main(String name) {
@@ -88,21 +86,14 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			highScore = 0;
 		}
 
-		scoreLabel.setBounds(20, 20, 100, 50);
-		scoreLabel.setForeground(Color.RED);
-		scoreLabel.setFont(new Font("Arial", Font.PLAIN, 30));
-
 		addKeyListener(this);
 		setFocusable(true);
-		add(scoreLabel);
-
-		//music();
 	}
 
 	public void paintComponent(final Graphics g) {
 		Rectangle[] pipe = new Rectangle[10];
 		Rectangle o1 = new Rectangle((int) xPos, (int) yPos, 35, 35);
-
+		
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -123,10 +114,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		g.setColor(new Color(48, 179, 255));
 		g.fillRect(0, 0, 1280, 720);
 
-		g.setColor(Color.WHITE);
+		g.setColor(new Color(245, 251, 255));
 		for (int i = 300; i <= 1200; i += 300) { // draw clouds
 			paintOvals(g, cloudX, cloudY);
-			paintOvals(g, cloudX + i, cloudY + 30);
+			paintOvals(g, cloudX + i, cloudY);
 		}
 
 		g.setColor(new Color(0, 212, 49));
@@ -138,6 +129,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		if (gameStarted) {
 			g.setColor(Color.YELLOW);
 			g.fillRect(o1.x, o1.y, o1.width, o1.height);
+			g.setColor(Color.RED);
+			g.setFont(new Font("Arial", Font.PLAIN, 35));
+			g.drawString(Integer.toString(score), 635, 30);
 		}
 		
 
@@ -156,10 +150,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.drawString("Don't touch the ground", 385, 350);
 			g.drawString("Press space to begin", 420, 400);
 		}
-		if (o1.intersects(pipe[0]) || o1.intersects(pipe[1]) || o1.intersects(pipe[2]) || o1.intersects(pipe[3]) // hit
-																													// detection
+		if (o1.intersects(pipe[0]) || o1.intersects(pipe[1]) || o1.intersects(pipe[2]) || o1.intersects(pipe[3]) 
 				|| o1.intersects(pipe[4]) || o1.intersects(pipe[5]) || o1.intersects(pipe[6]) || o1.intersects(pipe[7])
-				|| o1.intersects(pipe[8]) || o1.intersects(pipe[9])) {
+				|| o1.intersects(pipe[8]) || o1.intersects(pipe[9])) { //Hit detection
 			timer.stop();
 			gameOver = true;
 		}
@@ -243,6 +236,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		g.fillOval((int) cloudX2, (int) cloudY2 - 40, 150, 75);
 		g.fillOval((int) cloudX2 + 30, (int) (cloudY2 - 70), 150, 75);
 		g.fillOval((int) cloudX2 - 50, (int) (cloudY2 - 95), 150, 75);
+		
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -260,8 +254,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		if (clear <= 640) {
 			score += 1;
-			scoreLabel.setText(Integer.toString(score));
 			clear += 300;
+			soundEffect();
 		}
 
 		// Pipe things moving etc.
@@ -284,21 +278,26 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				pipeY[2 * i + 1] = pipeY[2 * i] + pipeGap;
 			}
 		}
+		
+		if (cloudX <= -175){
+			cloudX = 124;
+		}
 
 		repaint();
 	}
 
-	public void music() {
+	
+	public void soundEffect() {
 
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 				try {
-					AudioInputStream is = AudioSystem.getAudioInputStream(soundFile);
+					AudioInputStream ais = AudioSystem.getAudioInputStream(pointSFX);
 					Clip clip = AudioSystem.getClip();
-					clip.open(is);
-					clip.loop(Clip.LOOP_CONTINUOUSLY);
+					clip.open(ais);
+					clip.start();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -313,7 +312,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		if (c == KeyEvent.VK_SPACE) {
 			yVelocity = -7;
 
-			if (yPos <= 100) {
+			if (yPos <= 50) {
 				yVelocity = -4;
 			}
 		}
@@ -331,7 +330,6 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			timer.start();
 			gameStarted = true;
 
-			scoreLabel.setText(Integer.toString(score));
 		}
 		if (gameOver) {
 
@@ -339,7 +337,6 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				timer.start();
 
 				score = 0;
-				scoreLabel.setText(Integer.toString(score));
 				gameOver = false;
 				yVelocity = 0;
 				yPos = 0;
