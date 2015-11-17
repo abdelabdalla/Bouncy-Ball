@@ -115,7 +115,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		g.fillRect(0, 0, 1280, 720);
 
 		g.setColor(new Color(245, 251, 255));
-		for (int i = 300; i <= 1200; i += 300) { // draw clouds
+		for (int i = 350; i <= 1400; i += 350) { // draw clouds
 			paintOvals(g, cloudX, cloudY);
 			paintOvals(g, cloudX + i, cloudY);
 		}
@@ -280,7 +280,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 		
 		if (cloudX <= -175){
-			cloudX = 124;
+			cloudX = 174;
 		}
 
 		repaint();
