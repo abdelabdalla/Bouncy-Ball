@@ -5,9 +5,10 @@ import org.parse4j.Parse;
 
 public class Frame {
 	public static void main(String[] args) {
+		ImageIcon img = new ImageIcon("Icon.png");
+		String name = JOptionPane.showInputDialog(null, "Please enter your username", "Welcome",
+				JOptionPane.PLAIN_MESSAGE);// gets username
 
-		String name = JOptionPane.showInputDialog(null, "Please enter your username", "Welcome", JOptionPane.PLAIN_MESSAGE);// gets
-																															// username
 
 		if (name == null || (name != null && ("".equals(name)))) { // If
 																	// cancelled
@@ -25,6 +26,7 @@ public class Frame {
 		frame.setTitle("Bouncy Box");
 		frame.setVisible(true);
 		frame.setResizable(false);
+		frame.setIconImage(img.getImage());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Parse.initialize("OsBlnIJZzv1diW5vNr9nn2zlJqmK5Rhj75R5qf6t", "LvYemJh5dyfb4pZ9PYmgzTJRNIB7TkFXQ1NMnt1V");// connects
 																													// to

@@ -238,6 +238,12 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		g.fillOval((int) cloudX2 - 50, (int) (cloudY2 - 95), 150, 75);
 		
 	}
+	
+	public void onlineCheck(){
+		
+	}
+	
+	
 
 	public void actionPerformed(ActionEvent e) {
 
