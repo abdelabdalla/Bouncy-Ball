@@ -21,6 +21,7 @@ import java.util.Random;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -67,6 +68,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	File pointSFX = new File("Cleared.wav");
 	
 	String playerName;
+	String worldBestScore;
+	
+	
 
 	public Main(String name) {
 		playerName = name;
@@ -77,8 +81,13 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 
 		try {
+
 			BufferedReader br = new BufferedReader(new FileReader("HScore.txt"));
-			highScore = br.read();
+			
+			String s = br.readLine();
+			
+			highScore = Integer.parseInt(s);
+			
 			System.out.println(highScore);
 			br.close();
 
@@ -153,8 +162,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		if (o1.intersects(pipe[0]) || o1.intersects(pipe[1]) || o1.intersects(pipe[2]) || o1.intersects(pipe[3]) 
 				|| o1.intersects(pipe[4]) || o1.intersects(pipe[5]) || o1.intersects(pipe[6]) || o1.intersects(pipe[7])
 				|| o1.intersects(pipe[8]) || o1.intersects(pipe[9])) { //Hit detection
-			timer.stop();
+			
 			gameOver = true;
+			timer.stop();
 		}
 
 		if (gamePaused) { // when paused
@@ -193,14 +203,16 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 							try {
 								ob.save();
-								g.drawString("You're the best", 400, 300);
+								JOptionPane.showMessageDialog(Frame.frame, "You have the best high score online!", "Congratulations!", JOptionPane.DEFAULT_OPTION);
 
 							} catch (ParseException e1) {
 
 								e1.printStackTrace();
 							}
 						} else {
-							System.out.println("Highscore: " + ob.getInt("Score") + " by " + ob.getString("User"));
+							worldBestScore =  "Score: " + ob.getInt("Score") + "\n" + "User: " + ob.getString("User");
+							System.out.println(worldBestScore);
+							
 						}
 					}
 				}
@@ -210,13 +222,20 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				highScore = score;
 
 				try {
+					
+					String s = Integer.toString(highScore);
+		            
 
 					Writer wr = new FileWriter("HScore.txt");
-					wr.write(highScore);
+					wr.write(s);
+					System.out.println(s);
 					wr.close();
 
 				} catch (IOException e) {
 					e.printStackTrace();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 
 			}
@@ -225,8 +244,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.setFont(new Font("Arial", Font.PLAIN, 45));
 			g.drawString("You lose!", 545, 250);
 			g.drawString("Local High Score: " + Integer.toString(highScore), 450, 300);
-			g.drawString("Press enter to retry or esc to exit", 295, 350);
-			score = 0;
+			g.drawString("Press enter to retry or esc to exit", 323, 350);
+			g.drawString("Press L to reveal the top scorer", 335, 400);		
+		
+			
 
 		}
 
@@ -259,7 +280,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		yPos += yVelocity;
 
 		if (clear <= 640) {
-			score += 1;
+			score += 531;
 			clear += 300;
 			soundEffect();
 		}
@@ -367,6 +388,18 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			if (c == KeyEvent.VK_ESCAPE) {
 				System.exit(0);
 			}
+			
+			if (c == KeyEvent.VK_L){
+				if(worldBestScore == null){
+				try{
+					Thread.sleep(700);
+				}catch (Exception e1){
+					
+				}
+				}
+				JOptionPane.showMessageDialog(Frame.frame, worldBestScore, "Top scorer", JOptionPane.PLAIN_MESSAGE);
+			}
+			
 		}
 	}
 
