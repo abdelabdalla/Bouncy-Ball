@@ -53,7 +53,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int clear = 1305;
 	int clearIntersectPoint = 640;
 	int highScore;
-	
+	int onlineScore;
+
 	double cloudX = 20;
 	double cloudY = rand.nextInt(100) + 40;
 	double terminalVelocity = 18.0;
@@ -64,12 +65,14 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	boolean gameOver = false;
 	boolean gameStarted = false;
 	boolean gamePaused = false;
+	boolean resume = false;
+	boolean exit = false;
 
 	File pointSFX = new File("Cleared.wav");
-	
+
 	String playerName;
 	String worldBestScore;
-	
+
 	public Main(String name) {
 		playerName = name;
 
@@ -81,18 +84,18 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		try {
 
 			BufferedReader br = new BufferedReader(new FileReader("HScore.txt"));
-			
+
 			String s = br.readLine();
-			
+
 			highScore = Integer.parseInt(s);
-			
+
 			System.out.println(highScore);
 			br.close();
 
 		} catch (Exception e) {
 			highScore = 0;
 		}
-		
+
 		onlineCheck();
 
 		addKeyListener(this);
@@ -102,7 +105,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	public void paintComponent(final Graphics g) {
 		Rectangle[] pipe = new Rectangle[10];
 		Rectangle o1 = new Rectangle((int) xPos, (int) yPos, 35, 35);
-		
+
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -134,7 +137,6 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.fillRect(p.x, p.y, p.width, p.height);
 		}
 
-		
 		if (gameStarted) {
 			g.setColor(Color.YELLOW);
 			g.fillRect(o1.x, o1.y, o1.width, o1.height);
@@ -142,7 +144,6 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.setFont(new Font("Arial", Font.PLAIN, 35));
 			g.drawString(Integer.toString(score), 635, 30);
 		}
-		
 
 		if (gameStarted == false && highScore != 0) { // at start
 			g.setColor(Color.RED);
@@ -159,33 +160,32 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.drawString("Don't touch the ground", 385, 350);
 			g.drawString("Press space to begin", 420, 400);
 		}
-		if (o1.intersects(pipe[0]) || o1.intersects(pipe[1]) || o1.intersects(pipe[2]) || o1.intersects(pipe[3]) 
-				|| o1.intersects(pipe[4]) || o1.intersects(pipe[5]) || o1.intersects(pipe[6]) || o1.intersects(pipe[7])
-				|| o1.intersects(pipe[8]) || o1.intersects(pipe[9])) { //Hit detection
-			
-			gameOver = true;
-			timer.stop();
+
+		for (int i = 0; i <= 9; i++) {
+			if (o1.intersects(pipe[i])) {
+				gameOver = true;
+				timer.stop();
+			}
 		}
 
 		if (gamePaused) { // when paused
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial ", Font.PLAIN, 45));
 			g.drawString("Paused", 545, 250);
-			g.drawString("Press enter to carry on", 420, 300);
+			g.drawString("Press enter to resume", 420, 300);
 			timer.stop();
 		}
 
 		if (gameOver) { // at game end
 
 			onlineCheck();
-		
+
 			if (highScore < score) {
 				highScore = score;
 
 				try {
-					
+
 					String s = Integer.toString(highScore);
-		            
 
 					Writer wr = new FileWriter("HScore.txt");
 					wr.write(s);
@@ -205,9 +205,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.drawString("You lose!", 545, 250);
 			g.drawString("Local High Score: " + Integer.toString(highScore), 450, 300);
 			g.drawString("Press enter to retry or esc to exit", 323, 350);
-			g.drawString("Press L to reveal the top scorer", 335, 400);		
-		
-			
+			g.drawString("Press L to reveal the top scorer", 335, 400);
 
 		}
 
@@ -217,10 +215,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		g.fillOval((int) cloudX2, (int) cloudY2 - 40, 150, 75);
 		g.fillOval((int) cloudX2 + 30, (int) (cloudY2 - 70), 150, 75);
 		g.fillOval((int) cloudX2 - 50, (int) (cloudY2 - 95), 150, 75);
-		
+
 	}
-	
-	public void onlineCheck(){ //TODO online check
+
+	public void onlineCheck() { // TODO online check
 
 		final int s1 = score;
 		ParseObject object = new ParseObject("Scores");
@@ -248,24 +246,23 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 						try {
 							ob.save();
-							JOptionPane.showMessageDialog(Frame.frame, "You have the best high score online!", "Congratulations!", JOptionPane.DEFAULT_OPTION);
-							worldBestScore =  "Score: " + ob.getInt("Score") + "\n" + "User: " + ob.getString("User");
+							JOptionPane.showMessageDialog(Frame.frame, "You have the best high score online!",
+									"Congratulations!", JOptionPane.DEFAULT_OPTION);
+							worldBestScore = "Score: " + ob.getInt("Score") + "\n" + "User: " + ob.getString("User");
 
 						} catch (ParseException e1) {
 
 							e1.printStackTrace();
 						}
 					} else {
-						worldBestScore =  "Score: " + ob.getInt("Score") + "\n" + "User: " + ob.getString("User");
+						worldBestScore = "Score: " + ob.getInt("Score") + "\n" + "User: " + ob.getString("User");
 						System.out.println(worldBestScore);
-						
+						onlineScore = ob.getInt("Score");
 					}
 				}
 			}
 		});
 	}
-	
-	
 
 	public void actionPerformed(ActionEvent e) {
 
@@ -287,11 +284,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 
 		// Pipe things moving etc.
-		pipeX[0] = pipeX[0] + pipeSpeed;
-		pipeX[1] = pipeX[1] + pipeSpeed;
-		pipeX[2] = pipeX[2] + pipeSpeed;
-		pipeX[3] = pipeX[3] + pipeSpeed;
-		pipeX[4] = pipeX[4] + pipeSpeed;
+		pipeX[0] += pipeSpeed;
+		pipeX[1] += pipeSpeed;
+		pipeX[2] += pipeSpeed;
+		pipeX[3] += pipeSpeed;
+		pipeX[4] += pipeSpeed;
 		clear += pipeSpeed;
 		cloudX -= cloudSpeed;
 
@@ -306,15 +303,14 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				pipeY[2 * i + 1] = pipeY[2 * i] + pipeGap;
 			}
 		}
-		
-		if (cloudX <= -175){
-			cloudX = 174;
+
+		if (cloudX <= -185) {
+			cloudX = 164.79999999999868;
 		}
 
 		repaint();
 	}
 
-	
 	public void soundEffect() {
 
 		new Thread(new Runnable() {
@@ -389,11 +385,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			if (c == KeyEvent.VK_ESCAPE) {
 				System.exit(0);
 			}
-			
-			if (c == KeyEvent.VK_L){
+
+			if (c == KeyEvent.VK_L) {
 				JOptionPane.showMessageDialog(Frame.frame, worldBestScore, "Top scorer", JOptionPane.PLAIN_MESSAGE);
 			}
-			
+
 		}
 	}
 
