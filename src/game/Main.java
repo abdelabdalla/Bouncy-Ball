@@ -70,8 +70,6 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	String playerName;
 	String worldBestScore;
 	
-	
-
 	public Main(String name) {
 		playerName = name;
 
@@ -94,6 +92,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		} catch (Exception e) {
 			highScore = 0;
 		}
+		
+		onlineCheck();
 
 		addKeyListener(this);
 		setFocusable(true);
@@ -177,47 +177,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		if (gameOver) { // at game end
 
-			final int s1 = score;
-			ParseObject object = new ParseObject("Scores");
-			object.put("User", playerName);
-			object.put("Score", s1);
-			object.saveInBackground(); // save score
-
-			ParseQuery<ParseObject> q = ParseQuery.getQuery("Scores"); // tests
-																		// to
-																		// see
-																		// if
-																		// score
-																		// is
-																		// high
-																		// score
-			q.getInBackground("PseztczTNY", new GetCallback<ParseObject>() {
-
-				@Override
-				public void done(ParseObject ob, ParseException e) {
-					if (e == null) {
-						if (ob.getInt("Score") < s1) {
-							ob.put("User", playerName);
-							System.out.println(score);
-							ob.put("Score", s1);
-
-							try {
-								ob.save();
-								JOptionPane.showMessageDialog(Frame.frame, "You have the best high score online!", "Congratulations!", JOptionPane.DEFAULT_OPTION);
-
-							} catch (ParseException e1) {
-
-								e1.printStackTrace();
-							}
-						} else {
-							worldBestScore =  "Score: " + ob.getInt("Score") + "\n" + "User: " + ob.getString("User");
-							System.out.println(worldBestScore);
-							
-						}
-					}
-				}
-			});
-
+			onlineCheck();
+		
 			if (highScore < score) {
 				highScore = score;
 
@@ -234,7 +195,6 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 
@@ -260,8 +220,49 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		
 	}
 	
-	public void onlineCheck(){
-		
+	public void onlineCheck(){ //TODO online check
+
+		final int s1 = score;
+		ParseObject object = new ParseObject("Scores");
+		object.put("User", playerName);
+		object.put("Score", s1);
+		object.saveInBackground(); // save score
+
+		ParseQuery<ParseObject> q = ParseQuery.getQuery("Scores"); // tests
+																	// to
+																	// see
+																	// if
+																	// score
+																	// is
+																	// high
+																	// score
+		q.getInBackground("PseztczTNY", new GetCallback<ParseObject>() {
+
+			@Override
+			public void done(ParseObject ob, ParseException e) {
+				if (e == null) {
+					if (ob.getInt("Score") < s1) {
+						ob.put("User", playerName);
+						System.out.println(score);
+						ob.put("Score", s1);
+
+						try {
+							ob.save();
+							JOptionPane.showMessageDialog(Frame.frame, "You have the best high score online!", "Congratulations!", JOptionPane.DEFAULT_OPTION);
+							worldBestScore =  "Score: " + ob.getInt("Score") + "\n" + "User: " + ob.getString("User");
+
+						} catch (ParseException e1) {
+
+							e1.printStackTrace();
+						}
+					} else {
+						worldBestScore =  "Score: " + ob.getInt("Score") + "\n" + "User: " + ob.getString("User");
+						System.out.println(worldBestScore);
+						
+					}
+				}
+			}
+		});
 	}
 	
 	
@@ -280,7 +281,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		yPos += yVelocity;
 
 		if (clear <= 640) {
-			score += 531;
+			score += 1;
 			clear += 300;
 			soundEffect();
 		}
@@ -390,13 +391,6 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			}
 			
 			if (c == KeyEvent.VK_L){
-				if(worldBestScore == null){
-				try{
-					Thread.sleep(700);
-				}catch (Exception e1){
-					
-				}
-				}
 				JOptionPane.showMessageDialog(Frame.frame, worldBestScore, "Top scorer", JOptionPane.PLAIN_MESSAGE);
 			}
 			
