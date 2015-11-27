@@ -21,6 +21,9 @@ import java.util.Random;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -39,6 +42,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 	Timer timer = new Timer(13, this);
 	Random rand = new Random();
+
 
 	int score = 0;
 	int yPos = 0;
@@ -67,12 +71,19 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	boolean gamePaused = false;
 	boolean resume = false;
 	boolean exit = false;
+	boolean setSmoothing = true;
 
 	File pointSFX = new File("Cleared.wav");
 
 	String playerName;
 	String worldBestScore;
-
+	String[] difficulty = {"Easy", "Medium", "Hard"};
+	
+	JCheckBox smoothing = new JCheckBox("Enable smooth edges");
+	JFrame optionsFrame = new JFrame("Options");
+	JPanel optionsPanel = new JPanel();
+	JComboBox<String> difficultyBox = new JComboBox<>(difficulty);
+	
 	public Main(String name) {
 		playerName = name;
 
@@ -105,12 +116,13 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	public void paintComponent(final Graphics g) {
 		Rectangle[] pipe = new Rectangle[10];
 		Rectangle o1 = new Rectangle((int) xPos, (int) yPos, 35, 35);
-
+		
+		if(setSmoothing){
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		super.paintComponent(g2d);
-
+		}
 		for (int i = 0; i < 10; i += 2) { // initialise pipe y axis
 			while (pipeY[i] < -500) {
 				pipeY[i] = rand.nextInt(600) - 600;
@@ -145,21 +157,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.drawString(Integer.toString(score), 635, 30);
 		}
 
-		if (gameStarted == false && highScore != 0) { // at start
-			g.setColor(Color.RED);
-			g.setFont(new Font("Arial ", Font.PLAIN, 45));
-			g.drawString("Bouncy Box", 510, 100);
-			g.drawString("Press space to begin", 420, 300);
-
-		} else if (gameStarted == false && highScore == 0) {
-			g.setColor(Color.RED);
-			g.setFont(new Font("Arial", Font.PLAIN, 45));
-			g.drawString("Bouncy Box", 510, 100);
-			g.drawString("Press space to jump", 425, 250);
-			g.drawString("Avoid the green pipes", 400, 300);
-			g.drawString("Don't touch the ground", 385, 350);
-			g.drawString("Press space to begin", 420, 400);
-		}
+		displayMenu(g);
 
 		for (int i = 0; i <= 9; i++) {
 			if (o1.intersects(pipe[i])) {
@@ -278,7 +276,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		yPos += yVelocity;
 
 		if (clear <= 640) {
-			score += 1;
+			score++;
 			clear += 300;
 			soundEffect();
 		}
@@ -309,6 +307,24 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 
 		repaint();
+	}
+	
+	public void displayMenu(Graphics g){
+		if (!gameStarted && highScore != 0 && !gameOver) { // at start
+			g.setColor(Color.RED);
+			g.setFont(new Font("Arial ", Font.PLAIN, 45));
+			g.drawString("Bouncy Box", 510, 100);
+			g.drawString("Press space to begin", 420, 300);
+
+		} else if (!gameStarted && highScore == 0 && !gameOver) {
+			g.setColor(Color.RED);
+			g.setFont(new Font("Arial", Font.PLAIN, 45));
+			g.drawString("Bouncy Box", 510, 100);
+			g.drawString("Press space to jump", 425, 250);
+			g.drawString("Avoid the green pipes", 410, 300);
+			g.drawString("Don't touch the ground", 405, 350);
+			g.drawString("Press space to begin", 420, 400);
+		}
 	}
 
 	public void soundEffect() {
@@ -388,6 +404,29 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 			if (c == KeyEvent.VK_L) {
 				JOptionPane.showMessageDialog(Frame.frame, worldBestScore, "Top scorer", JOptionPane.PLAIN_MESSAGE);
+			}
+			
+			if (c == KeyEvent.VK_O) {
+				optionsPanel.setLayout(null);
+				optionsFrame.setLocationRelativeTo(null);
+				optionsFrame.setSize(300, 200);
+				optionsFrame.setResizable(false);
+				optionsFrame.setVisible(true);
+				optionsPanel.add(smoothing);
+				smoothing.setBounds(20, 20, 200, 30);
+				
+				if (smoothing.isSelected()) {
+					setSmoothing = false;
+				} else {
+					setSmoothing = true;
+				}
+				
+				difficultyBox.setBounds(20, 60, 70, 20);
+				optionsPanel.add(difficultyBox);
+				String selectedOption = (String) difficultyBox.getSelectedItem();
+				System.out.println(selectedOption);
+				
+				optionsFrame.add(optionsPanel);
 			}
 
 		}
