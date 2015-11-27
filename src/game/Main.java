@@ -21,9 +21,10 @@ import java.util.Random;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.swing.JCheckBox;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -77,12 +78,14 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 	String playerName;
 	String worldBestScore;
-	String[] difficulty = {"Easy", "Medium", "Hard"};
+	String difficultyOption;
+	String[] difficulty = {"Easy", "Normal", "Hard"};
 	
-	JCheckBox smoothing = new JCheckBox("Enable smooth edges");
 	JFrame optionsFrame = new JFrame("Options");
 	JPanel optionsPanel = new JPanel();
+	JLabel d = new JLabel("Difficulty");
 	JComboBox<String> difficultyBox = new JComboBox<>(difficulty);
+	JButton saveDifficulty = new JButton("Save");
 	
 	public Main(String name) {
 		playerName = name;
@@ -117,12 +120,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		Rectangle[] pipe = new Rectangle[10];
 		Rectangle o1 = new Rectangle((int) xPos, (int) yPos, 35, 35);
 		
-		if(setSmoothing){
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		super.paintComponent(g2d);
-		}
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			super.paintComponent(g2d);
+		
 		for (int i = 0; i < 10; i += 2) { // initialise pipe y axis
 			while (pipeY[i] < -500) {
 				pipeY[i] = rand.nextInt(600) - 600;
@@ -204,7 +206,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.drawString("Local High Score: " + Integer.toString(highScore), 450, 300);
 			g.drawString("Press enter to retry or esc to exit", 323, 350);
 			g.drawString("Press L to reveal the top scorer", 335, 400);
-
+			g.drawString("Press O to view options", 402, 450);
 		}
 
 	}
@@ -315,6 +317,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.setFont(new Font("Arial ", Font.PLAIN, 45));
 			g.drawString("Bouncy Box", 510, 100);
 			g.drawString("Press space to begin", 420, 300);
+			g.drawString("Press O to view options", 402, 350);
 
 		} else if (!gameStarted && highScore == 0 && !gameOver) {
 			g.setColor(Color.RED);
@@ -324,6 +327,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.drawString("Avoid the green pipes", 410, 300);
 			g.drawString("Don't touch the ground", 405, 350);
 			g.drawString("Press space to begin", 420, 400);
+			g.drawString("Press O to view options", 402, 450);
 		}
 	}
 
@@ -345,6 +349,51 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		}).start();
 	}
+	
+	public void options(){
+		optionsPanel.setLayout(null);	
+		
+		optionsFrame.setTitle("Options");
+		optionsFrame.setSize(230, 130);
+		optionsFrame.setLocationRelativeTo(null);
+		optionsFrame.setResizable(false);
+		optionsFrame.setVisible(true);
+		
+		d.setBounds(20, 20, 70, 20);
+		
+		difficultyBox.setBounds(80, 20, 70, 20);
+		optionsPanel.add(difficultyBox);
+		
+		saveDifficulty.setBounds(80, 60, 70, 20);
+		
+		saveDifficulty.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				difficultyOption = (String) difficultyBox.getSelectedItem();
+				System.out.println(difficultyOption);
+				if (difficultyOption.equals("Easy")){
+					pipeGap = 650;
+				}
+				if (difficultyOption.equals("Normal")){
+					pipeGap = 635;
+				}
+				if (difficultyOption.equals("Hard")){
+					pipeGap = 620;
+				}
+				System.out.println(pipeGap);
+				JOptionPane.showMessageDialog(Frame.frame, "Options saved!");
+				optionsFrame.setVisible(false);
+			}
+			
+		});
+		
+
+		optionsPanel.add(d);
+		optionsPanel.add(saveDifficulty);
+		optionsFrame.add(optionsPanel);
+	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
@@ -365,8 +414,12 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				gamePaused = false;
 			}
 		}
+		
+		if (c == KeyEvent.VK_O && !gameStarted){
+			options();
+		}
 
-		if (c == KeyEvent.VK_SPACE && gameStarted == false) {
+		if (c == KeyEvent.VK_SPACE && !gameStarted) {
 			timer.start();
 			gameStarted = true;
 
@@ -407,26 +460,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			}
 			
 			if (c == KeyEvent.VK_O) {
-				optionsPanel.setLayout(null);
-				optionsFrame.setLocationRelativeTo(null);
-				optionsFrame.setSize(300, 200);
-				optionsFrame.setResizable(false);
-				optionsFrame.setVisible(true);
-				optionsPanel.add(smoothing);
-				smoothing.setBounds(20, 20, 200, 30);
+				options();
 				
-				if (smoothing.isSelected()) {
-					setSmoothing = false;
-				} else {
-					setSmoothing = true;
-				}
-				
-				difficultyBox.setBounds(20, 60, 70, 20);
-				optionsPanel.add(difficultyBox);
-				String selectedOption = (String) difficultyBox.getSelectedItem();
-				System.out.println(selectedOption);
-				
-				optionsFrame.add(optionsPanel);
 			}
 
 		}

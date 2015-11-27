@@ -51,10 +51,6 @@ public class Frame {
 			
 		}
 		
-		
-		
-
-		
 		panel = new Main(name);// initialises JPanel
 		frame.add(panel);
 		frame.setSize(1280, 720);// sets frame size
