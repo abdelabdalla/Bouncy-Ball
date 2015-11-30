@@ -105,7 +105,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			pipeY[i + 1] = pipeY[i] + pipeGap;
 		}
 
-		try {
+		try { // see if HScore.txt exists on the computer
 
 			BufferedReader br = new BufferedReader(new FileReader("HScore.txt"));
 
@@ -119,17 +119,26 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		} catch (Exception e) {
 			highScore = 0;
 		}
-
+		
+		try {
+			BufferedReader or = new BufferedReader(new FileReader("Options.txt")); // see if Options.txt exists on the computer
+			colourOption = or.readLine();
+			System.out.println(colourOption + " lel");
+			or.close();
+			
+		} catch (Exception e2) {
+			colourBox.setSelectedItem("Yellow");
+			colourOption = (String) colourBox.getSelectedItem();
+			System.out.println(colourOption);
+			
+		}
+		
 		onlineCheck();
 		
-		difficultyBox.setSelectedItem("Normal");
+		difficultyBox.setSelectedItem("Normal"); // set default difficulty
 		difficultyOption = (String) difficultyBox.getSelectedItem();
 		System.out.println(difficultyOption);
 		
-		colourBox.setSelectedItem("Yellow");
-		colourOption = (String) colourBox.getSelectedItem();
-		System.out.println(colourOption);
-
 		addKeyListener(this);
 		setFocusable(true);
 	}
@@ -138,7 +147,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		Rectangle[] pipe = new Rectangle[10];
 		Rectangle o1 = new Rectangle((int) xPos, (int) yPos, 35, 35);
 
-		Graphics2D g2d = (Graphics2D) g;
+		Graphics2D g2d = (Graphics2D) g;							// Anti-aliasing the drawn objects (smoothening the edges)
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -171,7 +180,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.fillRect(p.x, p.y, p.width, p.height);
 		}
 
-		if (gameStarted) {
+		if (gameStarted) { // display box and score
 			setColour(g);
 			g.fillRect(o1.x, o1.y, o1.width, o1.height);
 			g.setColor(Color.RED);
@@ -181,7 +190,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		displayMenu(g);
 
-		for (int i = 0; i <= 9; i++) {
+		for (int i = 0; i <= 9; i++) { // checks to see if box has collided with a pipe
 			if (o1.intersects(pipe[i])) {
 				gameOver = true;
 				timer.stop();
@@ -200,10 +209,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 			onlineCheck();
 
-			if (highScore < score) {
+			if (highScore < score) { // if new high score is achieved
 				highScore = score;
 
-				try {
+				try { // save high score to HScore.txt
 
 					String s = Integer.toString(highScore);
 
@@ -232,14 +241,14 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 	}
 
-	public void paintOvals(Graphics g, double cloudX2, double cloudY2) {
+	public void paintOvals(Graphics g, double cloudX2, double cloudY2) { // draw a cloud
 		g.fillOval((int) cloudX2, (int) cloudY2 - 40, 150, 75);
 		g.fillOval((int) cloudX2 + 30, (int) (cloudY2 - 70), 150, 75);
 		g.fillOval((int) cloudX2 - 50, (int) (cloudY2 - 95), 150, 75);
 
 	}
 
-	public void onlineCheck() { // TODO online check
+	public void onlineCheck() { // TODO online checking code
 
 		final int s1 = score;
 		ParseObject object = new ParseObject("Scores");
@@ -342,7 +351,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.drawString("Press space to begin", 420, 300);
 			g.drawString("Press O to view options", 402, 350);
 
-		} else if (!gameStarted && highScore == 0 && !gameOver) {
+		} else if (!gameStarted && highScore == 0 && !gameOver) { // at start of first ever use
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial", Font.PLAIN, 45));
 			g.drawString("Bouncy Box", 510, 100);
@@ -354,7 +363,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 	}
 
-	public void soundEffect() {
+	public void soundEffect() { // method which is called to play a sound when scoring a point
 
 		new Thread(new Runnable() {
 
@@ -374,7 +383,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}).start();
 	}
 
-	public void setColour(Graphics g) {
+	public void setColour(Graphics g) { // sets the colour of the box
 		switch (colourOption) {
 		case "Black":
 			g.setColor(Color.BLACK);
@@ -404,12 +413,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.setColor(Color.YELLOW);
 			break;
 		}
-		if (colourOption == null){
-			g.setColor(Color.YELLOW);
-		}
 	}
 
 	public void options() { // TODO Options Menu
+			
 		optionsPanel.setLayout(null);
 		optionsPanel.setBackground(bgColour);
 
@@ -420,9 +427,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		optionsFrame.setVisible(true);
 
 		difficultyLabel.setBounds(20, 20, 70, 20);
-		difficultyLabel.setForeground(Color.RED);
+		difficultyLabel.setForeground(Color.YELLOW);
 		colourLabel.setBounds(20, 60, 70, 20);
-		colourLabel.setForeground(Color.RED);
+		colourLabel.setForeground(Color.YELLOW);
 
 		difficultyBox.setBounds(80, 20, 70, 20);
 		difficultyBox.setBackground(Color.WHITE);
@@ -435,11 +442,13 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		colourBox.setSelectedItem(colourOption);
 		
 		saveDifficulty.setBounds(80, 100, 70, 20);
+		saveDifficulty.setBackground(Color.WHITE);
+		saveDifficulty.setForeground(Color.RED);
 
 		saveDifficulty.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) { // save the settings
 
 				saveOptions = true;
 
@@ -462,6 +471,16 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 					System.out.println(colourOption);
 
 					System.out.println(pipeGap);
+					
+					
+					try {
+						Writer owr = new FileWriter("Options.txt");
+						owr.write(colourOption);
+						owr.close();					
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				
 					saveOptions = false;
 
 				}
@@ -483,7 +502,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int c = e.getKeyCode();
-		if (c == KeyEvent.VK_SPACE) {
+		if (c == KeyEvent.VK_SPACE) { // bounce
 			yVelocity = -7;
 
 			if (yPos <= 50) {
@@ -504,14 +523,14 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			options();
 		}
 
-		if (c == KeyEvent.VK_SPACE && !gameStarted) {
+		if (c == KeyEvent.VK_SPACE && !gameStarted) { // start the game animations
 			timer.start();
 			gameStarted = true;
 
 		}
 		if (gameOver) {
 
-			if (c == KeyEvent.VK_ENTER) {
+			if (c == KeyEvent.VK_ENTER) { // reset the positions of the pipes etc.
 				timer.start();
 
 				score = 0;
@@ -536,16 +555,16 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				clear = 1305;
 				clearIntersectPoint = 640;
 			}
-			if (c == KeyEvent.VK_ESCAPE) {
+			if (c == KeyEvent.VK_ESCAPE) { // close the program
 				System.exit(0);
 			}
 
-			if (c == KeyEvent.VK_L) {
+			if (c == KeyEvent.VK_L) { // shows online top scorer
 				JOptionPane.showMessageDialog(Frame.frame, worldBestScore,
 						"Top scorer", JOptionPane.PLAIN_MESSAGE);
 			}
 
-			if (c == KeyEvent.VK_O) {
+			if (c == KeyEvent.VK_O) { // display options menu
 				options();
 
 			}
