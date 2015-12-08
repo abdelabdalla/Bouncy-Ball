@@ -49,22 +49,22 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int xPos = 615;
 	int pipe1X = 1280;
 	int distPipes = 300;
-	int[] pipeX = { pipe1X, pipe1X + distPipes, pipe1X + (2 * distPipes),
-			pipe1X + (3 * distPipes), pipe1X + (4 * distPipes) };
+	int[] pipeX = { pipe1X, pipe1X + distPipes, pipe1X + (2 * distPipes), pipe1X + (3 * distPipes),
+			pipe1X + (4 * distPipes) };
 	int[] pipeY = new int[10];
 	int pipeGap = 635;
-	int pipeSpeed = -2;
 	int pointAward = 1305;
 	int clearIntersectPoint = 640;
 	int highScore;
 	int onlineScore;
 
-	double cloudX = 20;
+	double cloudX = 20.0;
 	double cloudY = random.nextInt(100) + 40;
 	double terminalVelocity = 18.0;
 	double gravity = 0.34;
 	double yVelocity = 0.0;
 	double cloudSpeed = 0.3;
+	double pipeSpeed = -2.0;
 
 	boolean gameOver = false;
 	boolean gameStarted = false;
@@ -72,6 +72,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	boolean resume = false;
 	boolean exit = false;
 	boolean saveOptions = false;
+	boolean delay = false;
 
 	File pointSFX = new File("Cleared.wav");
 
@@ -79,12 +80,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	String worldBestScore;
 	String difficultyOption;
 	String colourOption;
-	String themeOption;
+	String modeOption = "Normal";
 
 	String[] difficulty = { "Easy", "Normal", "Hard" };
-	String[] boxColour = { "Black", "Blue", "Green", "Grey", "Orange", "Pink",
-			"Purple", "Red", "Yellow" };
-	String[] theme = { "Normal", "Night time", "High af", "Drunk", "Christmas" };
+	String[] boxColour = { "Black", "Blue", "Green", "Grey", "Orange", "Pink", "Purple", "Red", "Yellow" };
+	String[] mode = { "Normal", "Night", "High", "Drunk", "Christmas" };
 
 	JFrame optionsFrame = new JFrame("Options");
 
@@ -92,17 +92,17 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 	JLabel difficultyLabel = new JLabel("Difficulty");
 	JLabel colourLabel = new JLabel("Colour");
-	JLabel themeLabel = new JLabel("Theme");
+	JLabel modeLabel = new JLabel("Mode");
 
 	JComboBox<String> difficultyBox = new JComboBox<>(difficulty);
 	JComboBox<String> colourBox = new JComboBox<>(boxColour);
-	JComboBox<String> themeBox = new JComboBox<>(theme);
+	JComboBox<String> modeBox = new JComboBox<>(mode);
 
 	JButton saveDifficulty = new JButton("Save");
 
-	Color backgroundColour = new Color(48, 179, 255);
-	Color pipeColour = new Color(0, 212, 49);
-	Color cloudColour = new Color(254, 251, 255);
+	Color backgroundColour;
+	Color pipeColour;
+	Color cloudColour;
 
 	public Main(String name) {
 		playerName = name;
@@ -114,8 +114,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		try { // see if HScore.txt exists
 
-			BufferedReader highScoreReader = new BufferedReader(new FileReader(
-					"HScore.txt"));
+			BufferedReader highScoreReader = new BufferedReader(new FileReader("HScore.txt"));
 			String s = highScoreReader.readLine();
 			highScore = Integer.parseInt(s);
 			System.out.println("Local high score: " + highScore);
@@ -126,8 +125,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 
 		try {
-			BufferedReader or = new BufferedReader(
-					new FileReader("Options.txt")); // see if Options.txt exists
+			BufferedReader or = new BufferedReader(new FileReader("Options.txt")); // see
+																					// if
+																					// Options.txt
+																					// exists
 			colourOption = or.readLine();
 			System.out.println("Saved colour: " + colourOption);
 			or.close();
@@ -140,9 +141,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 
 		try {
-			BufferedReader difficultyReader = new BufferedReader(
-					new FileReader("Difficulty.txt")); // see if Difficulty.txt
-														// exists
+			BufferedReader difficultyReader = new BufferedReader(new FileReader("Difficulty.txt")); // see
+																									// if
+																									// Difficulty.txt
+																									// exists
 			difficultyOption = difficultyReader.readLine();
 			System.out.println("Saved difficulty: " + difficultyOption);
 			difficultyReader.close();
@@ -165,10 +167,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		Graphics2D g2d = (Graphics2D) g; // Anti-aliasing the drawn objects
 											// (smoothening the edges)
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		super.paintComponent(g2d);
 
 		for (int i = 0; i < 10; i += 2) { // initialise pipe y axis
@@ -183,6 +183,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			pipe[i + 1] = new Rectangle(pipeX[i / 2], pipeY[i + 1], 50, 1000);
 		}
 
+		setMode(g);
+
 		g.setColor(backgroundColour);
 		g.fillRect(0, 0, 1280, 720);
 
@@ -191,9 +193,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			paintOvals(g, cloudX, cloudY);
 			paintOvals(g, cloudX + i, cloudY);
 		}
-
+		
+		
 		g.setColor(pipeColour);
-		for (Rectangle p : pipe) { // draw pipes
+		for (Rectangle p : pipe) { // draw pipes	
 			g.fillRect(p.x, p.y, p.width, p.height);
 		}
 
@@ -250,8 +253,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial", Font.PLAIN, 45));
 			g.drawString("You lose!", 545, 250);
-			g.drawString("Local High Score: " + Integer.toString(highScore),
-					450, 300);
+			g.drawString("Local High Score: " + Integer.toString(highScore), 450, 300);
 			g.drawString("Press enter to retry or esc to exit", 323, 350);
 			g.drawString("Press L to reveal the top scorer", 335, 400);
 			g.drawString("Press O to view options", 402, 450);
@@ -259,12 +261,37 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 	}
 
-	public void setTheme(Graphics g) {
-		switch (themeOption) {
+	public void setMode(Graphics g) { // TODO Set Theme
+		switch (modeOption) {
 		case "Normal":
-			
-		case "":
-			
+			backgroundColour = new Color(48, 179, 255);
+			pipeColour = new Color(0, 212, 49);
+			cloudColour = new Color(254, 251, 255);
+			delay = false;
+			break;
+		case "Night":
+			backgroundColour = Color.BLACK;
+			pipeColour = new Color(0, 97, 24);
+			cloudColour = new Color(64, 61, 65);
+			delay = false;
+			break;
+		case "High":
+			backgroundColour = new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255));
+			pipeColour = new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255));
+			cloudColour = new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255));
+			delay = false;
+			break;
+		case "Drunk":
+			backgroundColour = new Color(48, 179, 255);
+			pipeColour = new Color(0, 212, 49);
+			cloudColour = new Color(254, 251, 255);
+			delay = true;
+			break;
+		case "Christmas":
+			backgroundColour = Color.WHITE;
+			pipeColour = new Color(40, 150, 0);
+			cloudColour = new Color(240, 240, 240);
+			delay = false;
 			break;
 		}
 	}
@@ -277,8 +304,12 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		g.fillOval((int) cloudX2 - 32, (int) (cloudY2 - 80), 150, 70);
 
 	}
+	
+	public void snow(Graphics g, double snowX, double snowY) {
+		g.fillOval((int) snowX, (int) snowY, 10, 10);
+	}
 
-	public void onlineCheck() { // TODO online checking code
+	public void onlineCheck() {
 
 		final int s1 = score;
 		ParseObject object = new ParseObject("Scores");
@@ -303,12 +334,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 						try {
 							pObject.save();
-							JOptionPane.showMessageDialog(Frame.frame,
-									"You have the best high score online!",
-									"Congratulations!",
-									JOptionPane.DEFAULT_OPTION);
-							worldBestScore = "Online high score: "
-									+ pObject.getInt("Score") + "\n" + "User: "
+							JOptionPane.showMessageDialog(Frame.frame, "You have the best high score online!",
+									"Congratulations!", JOptionPane.DEFAULT_OPTION);
+							worldBestScore = "Online high score: " + pObject.getInt("Score") + "\n" + "User: "
 									+ pObject.getString("User");
 
 						} catch (ParseException e1) {
@@ -316,8 +344,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 							e1.printStackTrace();
 						}
 					} else {
-						worldBestScore = "Online high score: "
-								+ pObject.getInt("Score") + "\n" + "User: "
+						worldBestScore = "Online high score: " + pObject.getInt("Score") + "\n" + "User: "
 								+ pObject.getString("User");
 						System.out.println(worldBestScore);
 						onlineScore = pObject.getInt("Score");
@@ -334,7 +361,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		if (yVelocity >= terminalVelocity) {
 			yVelocity = terminalVelocity;
 		}
-		if (yPosition >= 670 || yPosition <= -45) {
+		if (yPosition >= 670 || yPosition <= -75) {
 			gameOver = true;
 			timer.stop();
 		}
@@ -347,6 +374,18 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 
 		// Pipe things moving etc.
+		
+		if (delay){
+			pipeSpeed = -1;
+			cloudSpeed = 0.15;
+			gravity = 0.15;
+			terminalVelocity = 9.0;
+		} else {
+			terminalVelocity = 18.0;
+			gravity = 0.34;
+			cloudSpeed = 0.3;
+			pipeSpeed = -2.0;
+		}
 
 		pipeX[0] += pipeSpeed;
 		pipeX[1] += pipeSpeed;
@@ -405,8 +444,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			@Override
 			public void run() {
 				try {
-					AudioInputStream inputStream = AudioSystem
-							.getAudioInputStream(pointSFX);
+					AudioInputStream inputStream = AudioSystem.getAudioInputStream(pointSFX);
 					Clip clip = AudioSystem.getClip();
 					clip.open(inputStream);
 					clip.start();
@@ -456,33 +494,33 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		optionsPanel.setBackground(backgroundColour);
 
 		optionsFrame.setTitle("Options");
-		optionsFrame.setSize(230, 220);
+		optionsFrame.setSize(220, 220);
 		optionsFrame.setLocationRelativeTo(null);
 		optionsFrame.setResizable(false);
 		optionsFrame.setVisible(true);
 
 		difficultyLabel.setBounds(20, 20, 70, 20);
-		difficultyLabel.setForeground(Color.YELLOW);
+		difficultyLabel.setForeground(Color.RED);
 		colourLabel.setBounds(20, 60, 70, 20);
-		colourLabel.setForeground(Color.YELLOW);
-		themeLabel.setBounds(20, 100, 70, 20);
-		themeLabel.setForeground(Color.YELLOW);
+		colourLabel.setForeground(Color.RED);
+		modeLabel.setBounds(20, 100, 70, 20);
+		modeLabel.setForeground(Color.RED);
 
-		difficultyBox.setBounds(80, 20, 70, 20);
+		difficultyBox.setBounds(80, 20, 90, 20);
 		difficultyBox.setBackground(Color.WHITE);
 		difficultyBox.setForeground(Color.RED);
-		colourBox.setBounds(80, 60, 70, 20);
+		colourBox.setBounds(80, 60, 90, 20);
 		colourBox.setBackground(Color.WHITE);
 		colourBox.setForeground(Color.RED);
-		themeBox.setBounds(80, 100, 70, 20);
-		themeBox.setBackground(Color.WHITE);
-		themeBox.setForeground(Color.RED);
+		modeBox.setBounds(80, 100, 90, 20);
+		modeBox.setBackground(Color.WHITE);
+		modeBox.setForeground(Color.RED);
 
 		difficultyBox.setSelectedItem(difficultyOption);
 		colourBox.setSelectedItem(colourOption);
-		themeBox.setSelectedItem(themeOption);
+		modeBox.setSelectedItem(modeOption);
 
-		saveDifficulty.setBounds(80, 140, 70, 20);
+		saveDifficulty.setBounds(80, 140, 90, 20);
 		saveDifficulty.setBackground(Color.WHITE);
 		saveDifficulty.setForeground(Color.RED);
 
@@ -497,7 +535,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 					difficultyOption = (String) difficultyBox.getSelectedItem();
 					colourOption = (String) colourBox.getSelectedItem();
-					themeOption = (String) themeBox.getSelectedItem();
+					modeOption = (String) modeBox.getSelectedItem();
 
 					switch (difficultyOption) {
 					case "Easy":
@@ -520,8 +558,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 					}
 
 					try {
-						Writer difficultyWriter = new FileWriter(
-								"Difficulty.txt");
+						Writer difficultyWriter = new FileWriter("Difficulty.txt");
 						difficultyWriter.write(difficultyOption);
 						difficultyWriter.close();
 					} catch (Exception e2) {
@@ -538,11 +575,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		optionsPanel.add(difficultyBox);
 		optionsPanel.add(colourBox);
-		optionsPanel.add(themeBox);
+		optionsPanel.add(modeBox);
 
 		optionsPanel.add(colourLabel);
 		optionsPanel.add(difficultyLabel);
-		optionsPanel.add(themeLabel);
+		optionsPanel.add(modeLabel);
 
 		optionsPanel.add(saveDifficulty);
 
@@ -552,7 +589,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int c = e.getKeyCode();
-		if (c == KeyEvent.VK_SPACE) { // bounce
+
+		if (c == KeyEvent.VK_SPACE && gameStarted && !delay) { // bounce
 			yVelocity = -7;
 
 			if (yPosition <= 50) {
@@ -573,12 +611,14 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			options();
 		}
 
-		if (c == KeyEvent.VK_SPACE && !gameStarted) { // start the game
-														// animations
+		if (c == KeyEvent.VK_SPACE && !gameStarted) { // start the
+														// game
+			// animations
 			timer.start();
 			gameStarted = true;
 
 		}
+
 		if (gameOver) {
 
 			if (c == KeyEvent.VK_ENTER) { // reset the positions of the pipes
@@ -612,8 +652,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			}
 
 			if (c == KeyEvent.VK_L) { // shows online top scorer
-				JOptionPane.showMessageDialog(Frame.frame, worldBestScore,
-						"Top scorer", JOptionPane.PLAIN_MESSAGE);
+				JOptionPane.showMessageDialog(Frame.frame, worldBestScore, "Top scorer", JOptionPane.PLAIN_MESSAGE);
 			}
 
 			if (c == KeyEvent.VK_O) { // display options menu
@@ -626,7 +665,16 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+		int c = e.getKeyCode();
+		if (delay) {
+			if (c == KeyEvent.VK_SPACE) { // bounce
+				yVelocity = -4;
 
+				if (yPosition <= 50) {
+					yVelocity = -4;
+				}
+			}
+		}
 	}
 
 	@Override
