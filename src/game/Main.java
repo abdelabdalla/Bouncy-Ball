@@ -52,6 +52,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int[] pipeX = { pipe1X, pipe1X + distPipes, pipe1X + (2 * distPipes), pipe1X + (3 * distPipes),
 			pipe1X + (4 * distPipes) };
 	int[] pipeY = new int[10];
+	int[] starsX = new int[200];
+	int[] starsY = new int[200];
+	int[] snowX = new int[100];
+	int[] snowY = new int[100];
 	int pipeGap = 635;
 	int pointAward = 1305;
 	int clearIntersectPoint = 640;
@@ -111,6 +115,16 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			pipeY[i] = random.nextInt(600) - 600;
 			pipeY[i + 1] = pipeY[i] + pipeGap;
 		}
+		
+		for (int i = 0; i < 200; i++) {
+			starsX[i] = random.nextInt(1280);
+			starsY[i] = random.nextInt(720);
+		}
+		
+		for (int i = 0; i < 100; i++) {
+			snowX[i] = random.nextInt(1280);
+			snowY[i] = random.nextInt(720);
+		}
 
 		try { // see if HScore.txt exists
 
@@ -163,6 +177,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 	public void paintComponent(final Graphics g) {
 		Rectangle[] pipe = new Rectangle[10];
+		Rectangle[] stars = new Rectangle[200];
+		Rectangle[] snow = new Rectangle[100];
 		Rectangle box = new Rectangle((int) xPos, (int) yPosition, 35, 35);
 
 		Graphics2D g2d = (Graphics2D) g; // Anti-aliasing the drawn objects
@@ -183,11 +199,30 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			pipe[i + 1] = new Rectangle(pipeX[i / 2], pipeY[i + 1], 50, 1000);
 		}
 
-		setMode(g);
+		setMode(g);		
 
 		g.setColor(backgroundColour);
 		g.fillRect(0, 0, 1280, 720);
 
+		if ("Night".equals(modeOption)) {
+			g.setColor(new Color(240, 240, 240));	
+			
+			for (int i = 0; i < 200; i++) {
+				stars[i] = new Rectangle(starsX[i], starsY[i], 2, 2);
+			}
+			
+			for (Rectangle p : stars) {
+				g.fillOval(p.x, p.y, p.width, p.height);
+			}
+			
+			g.fillOval(140, 50, 150, 150);
+			g.setColor(Color.BLACK);
+			g.fillOval(158, 42, 150, 150);
+			
+			
+			
+		}
+		
 		g.setColor(cloudColour);
 		for (int i = 350; i <= 1400; i += 350) { // draw clouds
 			paintOvals(g, cloudX, cloudY);
@@ -199,6 +234,17 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		for (Rectangle p : pipe) { // draw pipes	
 			g.fillRect(p.x, p.y, p.width, p.height);
 		}
+		
+		
+		if ("Christmas".equals(modeOption)) {
+			for (int i = 0; i < 100; i++) {
+				snow[i] = new Rectangle(snowX[i], snowY[i], 10, 10);
+			}
+			for (Rectangle s : snow) {
+				g.fillOval(s.x, s.y, s.width, s.height);
+			}
+		}
+		
 
 		if (gameStarted) { // display box and score
 			setColour(g);
