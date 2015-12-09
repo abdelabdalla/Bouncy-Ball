@@ -52,10 +52,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int[] pipeX = { pipe1X, pipe1X + distPipes, pipe1X + (2 * distPipes), pipe1X + (3 * distPipes),
 			pipe1X + (4 * distPipes) };
 	int[] pipeY = new int[10];
-	int[] starsX = new int[200];
-	int[] starsY = new int[200];
-	int[] snowX = new int[100];
-	int[] snowY = new int[100];
+	double[] starsX = new double[200];
+	double[] starsY = new double[200];
+	double[] snowX = new double[100];
+	double[] snowY = new double[100];
 	int pipeGap = 635;
 	int pointAward = 1305;
 	int clearIntersectPoint = 640;
@@ -69,6 +69,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	double yVelocity = 0.0;
 	double cloudSpeed = 0.3;
 	double pipeSpeed = -2.0;
+	double snowSpeed = 0.2;
 
 	boolean gameOver = false;
 	boolean gameStarted = false;
@@ -115,12 +116,12 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			pipeY[i] = random.nextInt(600) - 600;
 			pipeY[i + 1] = pipeY[i] + pipeGap;
 		}
-		
+
 		for (int i = 0; i < 200; i++) {
 			starsX[i] = random.nextInt(1280);
 			starsY[i] = random.nextInt(720);
 		}
-		
+
 		for (int i = 0; i < 100; i++) {
 			snowX[i] = random.nextInt(1280);
 			snowY[i] = random.nextInt(720);
@@ -199,52 +200,57 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			pipe[i + 1] = new Rectangle(pipeX[i / 2], pipeY[i + 1], 50, 1000);
 		}
 
-		setMode(g);		
+		setMode(g);
 
 		g.setColor(backgroundColour);
 		g.fillRect(0, 0, 1280, 720);
 
 		if ("Night".equals(modeOption)) {
-			g.setColor(new Color(240, 240, 240));	
-			
+			g.setColor(new Color(240, 240, 240));
+
 			for (int i = 0; i < 200; i++) {
-				stars[i] = new Rectangle(starsX[i], starsY[i], 2, 2);
+				stars[i] = new Rectangle((int) starsX[i], (int) starsY[i], 2, 2);
 			}
-			
+
 			for (Rectangle p : stars) {
 				g.fillOval(p.x, p.y, p.width, p.height);
 			}
-			
+
 			g.fillOval(140, 50, 150, 150);
 			g.setColor(Color.BLACK);
 			g.fillOval(158, 42, 150, 150);
-			
-			
-			
+
 		}
-		
+
 		g.setColor(cloudColour);
-		for (int i = 350; i <= 1400; i += 350) { // draw clouds
-			paintOvals(g, cloudX, cloudY);
-			paintOvals(g, cloudX + i, cloudY);
-		}
-		
-		
-		g.setColor(pipeColour);
-		for (Rectangle p : pipe) { // draw pipes	
-			g.fillRect(p.x, p.y, p.width, p.height);
-		}
-		
-		
 		if ("Christmas".equals(modeOption)) {
+
+			cloudY = 50;
+
+			for (int i = 0; i <= 1400; i += 100) {
+				paintOvals(g, cloudX, cloudY);
+				paintOvals(g, cloudX + i, cloudY);
+			}
+
 			for (int i = 0; i < 100; i++) {
-				snow[i] = new Rectangle(snowX[i], snowY[i], 10, 10);
+				snow[i] = new Rectangle((int) snowX[i], (int) snowY[i], 10, 10);
 			}
 			for (Rectangle s : snow) {
+				g.setColor(cloudColour);
 				g.fillOval(s.x, s.y, s.width, s.height);
 			}
+		} else {
+			g.setColor(cloudColour);
+			for (int i = 350; i <= 1400; i += 350) { // draw clouds
+				paintOvals(g, cloudX, cloudY);
+				paintOvals(g, cloudX + i, cloudY);
+			}
 		}
-		
+
+		g.setColor(pipeColour);
+		for (Rectangle p : pipe) { // draw pipes
+			g.fillRect(p.x, p.y, p.width, p.height);
+		}
 
 		if (gameStarted) { // display box and score
 			setColour(g);
@@ -334,9 +340,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			delay = true;
 			break;
 		case "Christmas":
-			backgroundColour = Color.WHITE;
-			pipeColour = new Color(40, 150, 0);
-			cloudColour = new Color(240, 240, 240);
+			backgroundColour = new Color(48, 179, 255);
+			pipeColour = new Color(0, 212, 49);
+			cloudColour = new Color(254, 251, 255);
 			delay = false;
 			break;
 		}
@@ -349,10 +355,6 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		g.fillOval((int) cloudX2 + 30, (int) (cloudY2 - 70), 150, 65);
 		g.fillOval((int) cloudX2 - 32, (int) (cloudY2 - 80), 150, 70);
 
-	}
-	
-	public void snow(Graphics g, double snowX, double snowY) {
-		g.fillOval((int) snowX, (int) snowY, 10, 10);
 	}
 
 	public void onlineCheck() {
@@ -420,8 +422,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 
 		// Pipe things moving etc.
-		
-		if (delay){
+
+		if (delay) {
 			pipeSpeed = -1;
 			cloudSpeed = 0.15;
 			gravity = 0.15;
@@ -441,6 +443,24 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		pointAward += pipeSpeed;
 		cloudX -= cloudSpeed;
 
+		for (int i = 0; i < 200; i++) {
+			starsX[i] -= 0.1;
+			if (starsX[i] < 0) {
+				starsX[i] = 1282;
+			}
+
+		}
+
+		for (int i = 0; i < 100; i++) {
+			snowY[i] += snowSpeed;
+
+			if (snowY[i] > 720) {
+				snowX[i] = random.nextInt(1280);
+				snowY[i] = -10;
+			}
+
+		}
+
 		for (int i = 0; i < 5; i++) {
 			if (pipeX[i] <= -50) {
 				if (i != 0) {
@@ -453,7 +473,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			}
 		}
 
-		if (cloudX <= -185) {
+		if ("Christmas".equals(modeOption)) {
+			if (cloudX <= -185) {
+				cloudX = -85;
+			}
+		} else if (cloudX <= -185) {
 			cloudX = 164.79999999999868;
 		}
 
@@ -714,7 +738,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		int c = e.getKeyCode();
 		if (delay) {
 			if (c == KeyEvent.VK_SPACE) { // bounce
-				yVelocity = -4;
+				yVelocity = -4.5;
 
 				if (yPosition <= 50) {
 					yVelocity = -4;
