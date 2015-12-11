@@ -42,7 +42,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	private static final long serialVersionUID = 1L;
 
 	Timer timer = new Timer(13, this);
-	Random random = new Random();
+	Random random = new Random(); // well this is random
 
 	int score = 0;
 	int yPosition = 0;
