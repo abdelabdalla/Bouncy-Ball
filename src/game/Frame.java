@@ -19,12 +19,12 @@ public class Frame {
 	static Main panel;
 	
 	public static void main(String[] args) {
-		ImageIcon img = new ImageIcon("Icon.png");
+		ImageIcon img = new ImageIcon("Icon.png"); // Imports an icon image for the taskbar and stuff
 		String name;
 		
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("Username.txt"));
-			name = br.readLine();
+			BufferedReader br = new BufferedReader(new FileReader("Username.txt")); // See if username.txt exists
+			name = br.readLine(); // Make the username whatever is in username.txt
 			br.close();
 
 		} catch (Exception e) {
@@ -41,7 +41,7 @@ public class Frame {
 			try {
 
 				Writer wr = new FileWriter("Username.txt");
-				wr.write(name);
+				wr.write(name); // Save the inputted username into Username.txt
 				wr.close();
 
 			} catch (IOException e1) {
@@ -58,7 +58,7 @@ public class Frame {
 		frame.setTitle("Bouncy Box");
 		frame.setVisible(true);
 		frame.setResizable(false);
-		frame.setIconImage(img.getImage());
+		frame.setIconImage(img.getImage()); // Put the icon image onto the JFrame
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Parse.initialize("OsBlnIJZzv1diW5vNr9nn2zlJqmK5Rhj75R5qf6t", "LvYemJh5dyfb4pZ9PYmgzTJRNIB7TkFXQ1NMnt1V");// connects
 																													// to

@@ -52,15 +52,13 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int[] pipeX = { pipe1X, pipe1X + distPipes, pipe1X + (2 * distPipes), pipe1X + (3 * distPipes),
 			pipe1X + (4 * distPipes) };
 	int[] pipeY = new int[10];
-	double[] starsX = new double[200];
-	double[] starsY = new double[200];
-	double[] snowX = new double[100];
-	double[] snowY = new double[100];
 	int pipeGap = 635;
 	int pointAward = 1305;
 	int clearIntersectPoint = 640;
 	int highScore;
 	int onlineScore;
+	int[] treeX = {30, 40, 50, 60, 70};
+	int[] treeY = {50, 50, 70, 70, 90};
 
 	double cloudX = 20.0;
 	double cloudY = random.nextInt(100) + 40;
@@ -69,7 +67,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	double yVelocity = 0.0;
 	double cloudSpeed = 0.3;
 	double pipeSpeed = -2.0;
-	double snowSpeed = 0.2;
+	double snowSpeed = 0.4;
+	double[] starsX = new double[200];
+	double[] starsY = new double[200];
+	double[] snowX = new double[100];
+	double[] snowY = new double[100];
 
 	boolean gameOver = false;
 	boolean gameStarted = false;
@@ -78,6 +80,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	boolean exit = false;
 	boolean saveOptions = false;
 	boolean delay = false;
+	
+	Pipe object = new Pipe(pipeX[1], pipeY[1]);
 
 	File pointSFX = new File("Cleared.wav");
 
@@ -117,12 +121,12 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			pipeY[i + 1] = pipeY[i] + pipeGap;
 		}
 
-		for (int i = 0; i < 200; i++) {
+		for (int i = 0; i < 200; i++) { // make stars randomly blotted on the screen
 			starsX[i] = random.nextInt(1280);
 			starsY[i] = random.nextInt(720);
 		}
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 100; i++) { // make snow randomly blotted onto the screen
 			snowX[i] = random.nextInt(1280);
 			snowY[i] = random.nextInt(720);
 		}
@@ -202,40 +206,40 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		setMode(g);
 
-		g.setColor(backgroundColour);
+		g.setColor(backgroundColour); //draw the background
 		g.fillRect(0, 0, 1280, 720);
 
-		if ("Night".equals(modeOption)) {
+		if ("Night".equals(modeOption)) { // set the theme when night mode is selected
 			g.setColor(new Color(240, 240, 240));
 
-			for (int i = 0; i < 200; i++) {
+			for (int i = 0; i < 200; i++) { // initialise stars
 				stars[i] = new Rectangle((int) starsX[i], (int) starsY[i], 2, 2);
 			}
 
-			for (Rectangle p : stars) {
+			for (Rectangle p : stars) { // draw stars
 				g.fillOval(p.x, p.y, p.width, p.height);
 			}
 
-			g.fillOval(140, 50, 150, 150);
+			g.fillOval(140, 50, 150, 150); // draw the moon
 			g.setColor(Color.BLACK);
 			g.fillOval(158, 42, 150, 150);
 
 		}
 
 		g.setColor(cloudColour);
-		if ("Christmas".equals(modeOption)) {
+		if ("Christmas".equals(modeOption)) { // set the theme when Christmas mode is selected
 
 			cloudY = 50;
 
-			for (int i = 0; i <= 1400; i += 100) {
+			for (int i = 0; i <= 1400; i += 100) { // set clouds to look like a typical overcast day (although with a blue sky)
 				paintOvals(g, cloudX, cloudY);
 				paintOvals(g, cloudX + i, cloudY);
 			}
 
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < 100; i++) { // initialise the snow
 				snow[i] = new Rectangle((int) snowX[i], (int) snowY[i], 10, 10);
 			}
-			for (Rectangle s : snow) {
+			for (Rectangle s : snow) { // draw the snow
 				g.setColor(cloudColour);
 				g.fillOval(s.x, s.y, s.width, s.height);
 			}
@@ -251,6 +255,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		for (Rectangle p : pipe) { // draw pipes
 			g.fillRect(p.x, p.y, p.width, p.height);
 		}
+		
+		
+		//TODO Polygon attempt here
+		g.fillPolygon(treeX, treeY, treeX.length);
+		
 
 		if (gameStarted) { // display box and score
 			setColour(g);
@@ -301,7 +310,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				}
 
 			}
-
+			//Display the 'game over' message
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial", Font.PLAIN, 45));
 			g.drawString("You lose!", 545, 250);
@@ -314,7 +323,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	}
 
 	public void setMode(Graphics g) { // TODO Set Theme
-		switch (modeOption) {
+		
+		switch (modeOption) { // Get what ever mode is selected and change things accordingly
 		case "Normal":
 			backgroundColour = new Color(48, 179, 255);
 			pipeColour = new Color(0, 212, 49);
@@ -382,7 +392,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 						try {
 							pObject.save();
-							JOptionPane.showMessageDialog(Frame.frame, "You have the best high score online!",
+							JOptionPane.showMessageDialog(Frame.frame, "You have the best high score online!", // displays when the user gets the best score out of everyone
 									"Congratulations!", JOptionPane.DEFAULT_OPTION);
 							worldBestScore = "Online high score: " + pObject.getInt("Score") + "\n" + "User: "
 									+ pObject.getString("User");
@@ -404,7 +414,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 	public void actionPerformed(ActionEvent e) {
 
-		yVelocity += gravity;
+		yVelocity += gravity; // make the box speed up
 
 		if (yVelocity >= terminalVelocity) {
 			yVelocity = terminalVelocity;
@@ -413,7 +423,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			gameOver = true;
 			timer.stop();
 		}
-		yPosition += yVelocity;
+		yPosition += yVelocity; // make the ball's position move
 
 		if (pointAward <= 640) {
 			score++;
@@ -421,20 +431,21 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			// soundEffect();
 		}
 
-		// Pipe things moving etc.
+		
 
-		if (delay) {
+		if (delay) { // slows everything down when drunk mode is selected
 			pipeSpeed = -1;
 			cloudSpeed = 0.15;
 			gravity = 0.15;
 			terminalVelocity = 9.0;
 		} else {
-			terminalVelocity = 18.0;
+			terminalVelocity = 18.0; // the normal speeds of everything
 			gravity = 0.34;
 			cloudSpeed = 0.3;
 			pipeSpeed = -2.0;
 		}
 
+		// Pipe things moving etc.
 		pipeX[0] += pipeSpeed;
 		pipeX[1] += pipeSpeed;
 		pipeX[2] += pipeSpeed;
@@ -443,7 +454,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		pointAward += pipeSpeed;
 		cloudX -= cloudSpeed;
 
-		for (int i = 0; i < 200; i++) {
+		for (int i = 0; i < 200; i++) { // make the stars move slowly
 			starsX[i] -= 0.1;
 			if (starsX[i] < 0) {
 				starsX[i] = 1282;
@@ -451,9 +462,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		}
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 100; i++) { // make the snow fall slowly
 			snowY[i] += snowSpeed;
-
 			if (snowY[i] > 720) {
 				snowX[i] = random.nextInt(1280);
 				snowY[i] = -10;
@@ -461,7 +471,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		}
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 5; i++) { // make the pipes come at a set space and at a random y position
 			if (pipeX[i] <= -50) {
 				if (i != 0) {
 					pipeX[i] = pipeX[i - 1] + 300;
@@ -473,7 +483,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			}
 		}
 
-		if ("Christmas".equals(modeOption)) {
+		if ("Christmas".equals(modeOption)) { // Makes the clouds look like they are infinite
 			if (cloudX <= -185) {
 				cloudX = -85;
 			}
@@ -485,7 +495,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	}
 
 	public void displayMenu(Graphics g) {
-		if (!gameStarted && highScore != 0 && !gameOver) { // at start
+		if (!gameStarted && highScore != 0 && !gameOver) { // displays starting menu
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial ", Font.PLAIN, 45));
 			g.drawString("Bouncy Box", 510, 100);
@@ -737,7 +747,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	public void keyReleased(KeyEvent e) {
 		int c = e.getKeyCode();
 		if (delay) {
-			if (c == KeyEvent.VK_SPACE) { // bounce
+			if (c == KeyEvent.VK_SPACE) { // bounce when drunk mode is selected
 				yVelocity = -4.5;
 
 				if (yPosition <= 50) {
