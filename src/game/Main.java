@@ -1,3 +1,6 @@
+/**
+ * Made by Harnaam Jandoo
+ */
 package game;
 
 import java.awt.Color;
@@ -49,8 +52,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int xPos = 615;
 	int pipe1X = 1280;
 	int distPipes = 300;
-	int[] pipeX = { pipe1X, pipe1X + distPipes, pipe1X + (2 * distPipes), pipe1X + (3 * distPipes),
-			pipe1X + (4 * distPipes) };
+	int[] pipeX = { pipe1X, pipe1X + distPipes, pipe1X + (2 * distPipes), pipe1X + (3 * distPipes),	pipe1X + (4 * distPipes) };
 	int[] pipeY = new int[10];
 	int pipeGap = 635;
 	int pointAward = 1305;
@@ -63,7 +65,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	double cloudX = 20.0;
 	double cloudY = random.nextInt(100) + 40;
 	double terminalVelocity = 18.0;
-	double gravity = 0.34;
+	double gravity = 9.81 ;
 	double yVelocity = 0.0;
 	double cloudSpeed = 0.3;
 	double pipeSpeed = -2.0;
@@ -102,6 +104,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	JLabel difficultyLabel = new JLabel("Difficulty");
 	JLabel colourLabel = new JLabel("Colour");
 	JLabel modeLabel = new JLabel("Mode");
+	JLabel descriptionLabel= new JLabel();
 
 	JComboBox<String> difficultyBox = new JComboBox<>(difficulty);
 	JComboBox<String> colourBox = new JComboBox<>(boxColour);
@@ -323,8 +326,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	}
 
 	public void setMode(Graphics g) { // TODO Set Theme
-		
+	
 		switch (modeOption) { // Get what ever mode is selected and change things accordingly
+	
 		case "Normal":
 			backgroundColour = new Color(48, 179, 255);
 			pipeColour = new Color(0, 212, 49);
@@ -335,7 +339,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			backgroundColour = Color.BLACK;
 			pipeColour = new Color(0, 97, 24);
 			cloudColour = new Color(64, 61, 65);
-			delay = false;
+			delay = false;			
 			break;
 		case "High":
 			backgroundColour = new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255));
@@ -574,7 +578,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		optionsPanel.setBackground(backgroundColour);
 
 		optionsFrame.setTitle("Options");
-		optionsFrame.setSize(220, 220);
+		optionsFrame.setSize(220, 260);
 		optionsFrame.setLocationRelativeTo(null);
 		optionsFrame.setResizable(false);
 		optionsFrame.setVisible(true);
@@ -585,7 +589,25 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		colourLabel.setForeground(Color.RED);
 		modeLabel.setBounds(20, 100, 70, 20);
 		modeLabel.setForeground(Color.RED);
-
+		descriptionLabel.setBounds(20,140,180,45);
+		descriptionLabel.setForeground(Color.RED);
+		if(modeOption.equals("Normal")){ // TODO get to update when new option is selected (without having to press save and reopen menu)
+			descriptionLabel.setText("<html>Normal: Try to bounce the box<br>through the gap between the<br>pipes.</html>"); //description of the mode
+		}
+		else if(modeOption.equals("Night")){
+			descriptionLabel.setText("<html>Night: Don't get distracted<br>by all the pretty stars!<br>(PS black isn't a good colour)</html>");
+		}
+		else if(modeOption.equals("High")){
+			descriptionLabel.setText("<html>High: Things don't quite look right... (WARNING: contains<br> flasing images...)</html>"); //description of the mode
+		}
+		else if(modeOption.equals("Drunk")){
+			descriptionLabel.setText("<html>Drunk:\nDrink tends to slow<br>your reactions down....</html>"); //description of the mode
+		}
+		else if(modeOption.equals("Christmas")){
+			descriptionLabel.setText("<html>Christmas: 'Snow is falling... <br>all around you...'</html>"); //description of the mode
+		}
+		
+		
 		difficultyBox.setBounds(80, 20, 90, 20);
 		difficultyBox.setBackground(Color.WHITE);
 		difficultyBox.setForeground(Color.RED);
@@ -600,7 +622,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		colourBox.setSelectedItem(colourOption);
 		modeBox.setSelectedItem(modeOption);
 
-		saveDifficulty.setBounds(80, 140, 90, 20);
+		saveDifficulty.setBounds(80, 185, 90, 20);
 		saveDifficulty.setBackground(Color.WHITE);
 		saveDifficulty.setForeground(Color.RED);
 
@@ -660,6 +682,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		optionsPanel.add(colourLabel);
 		optionsPanel.add(difficultyLabel);
 		optionsPanel.add(modeLabel);
+		optionsPanel.add(descriptionLabel);
 
 		optionsPanel.add(saveDifficulty);
 
