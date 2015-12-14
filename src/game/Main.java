@@ -15,6 +15,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -193,6 +195,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		Graphics2D g2d = (Graphics2D) g; // Anti-aliasing the drawn objects
 											// (smoothening the edges)
+
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		super.paintComponent(g2d);
@@ -233,9 +236,15 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		g.setColor(cloudColour);
 		if ("Christmas".equals(modeOption)) { // set the theme when Christmas mode is selected
-
 			cloudY = 50;
-
+			try{
+			 BufferedImage image = ImageIO.read(new File("santa icon.png"));
+			 g.drawImage(image, xPos, yPosition, this);
+			}
+			catch(IOException e){
+				
+			}
+			
 			for (int i = 0; i <= 1400; i += 100) { // set clouds to look like a typical overcast day (although with a blue sky)
 				paintOvals(g, cloudX, cloudY);
 				paintOvals(g, cloudX + i, cloudY);
@@ -268,7 +277,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		if (gameStarted) { // display box and score
 			setColour(g);
-			g.fillRect(box.x, box.y, box.width, box.height);
+			if(!(modeOption.equals("Christmas"))){
+				g.fillRect(box.x, box.y, box.width, box.height);
+			}
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial", Font.PLAIN, 35));
 			g.drawString(Integer.toString(score), 635, 30);
