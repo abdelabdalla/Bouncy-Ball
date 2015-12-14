@@ -11,6 +11,8 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.BufferedReader;
@@ -591,21 +593,32 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		modeLabel.setForeground(Color.RED);
 		descriptionLabel.setBounds(20,140,180,45);
 		descriptionLabel.setForeground(Color.RED);
-		if(modeOption.equals("Normal")){ // TODO get to update when new option is selected (without having to press save and reopen menu)
-			descriptionLabel.setText("<html>Normal: Try to bounce the box<br>through the gap between the<br>pipes.</html>"); //description of the mode
-		}
-		else if(modeOption.equals("Night")){
-			descriptionLabel.setText("<html>Night: Don't get distracted<br>by all the pretty stars!<br>(PS black isn't a good colour)</html>");
-		}
-		else if(modeOption.equals("High")){
-			descriptionLabel.setText("<html>High: Things don't quite look right... (WARNING: contains<br> flasing images...)</html>"); //description of the mode
-		}
-		else if(modeOption.equals("Drunk")){
-			descriptionLabel.setText("<html>Drunk:\nDrink tends to slow<br>your reactions down....</html>"); //description of the mode
-		}
-		else if(modeOption.equals("Christmas")){
-			descriptionLabel.setText("<html>Christmas: 'Snow is falling... <br>all around you...'</html>"); //description of the mode
-		}
+		
+		modeBox.addItemListener(new ItemListener(){
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				modeOption = (String) e.getItem();
+				if(modeOption.equals("Normal")){ 
+					descriptionLabel.setText("<html>Normal: Try to bounce the box<br>through the gap between the<br>pipes.</html>"); //description of the mode
+				}
+				else if(modeOption.equals("Night")){
+					descriptionLabel.setText("<html>Night: Don't get distracted<br>by all the pretty stars!<br>(P.S. black isn't a good colour)</html>"); //description of the mode
+				}
+				else if(modeOption.equals("High")){
+					descriptionLabel.setText("<html>High: Things don't quite look right... (WARNING: contains<br> flasing images...)</html>"); //description of the mode
+				}
+				else if(modeOption.equals("Drunk")){
+					descriptionLabel.setText("<html>Drunk:\nDrink tends to slow<br>your reactions down....</html>"); //description of the mode
+				}
+				else if(modeOption.equals("Christmas")){
+					descriptionLabel.setText("<html>Christmas: 'Snow is falling... <br>all around you...'</html>"); //description of the mode
+				}
+			}
+			
+		});
+		
+		
 		
 		
 		difficultyBox.setBounds(80, 20, 90, 20);
