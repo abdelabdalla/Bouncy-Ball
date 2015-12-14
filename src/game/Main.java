@@ -1,5 +1,6 @@
 /**
  * Made by Harnaam Jandoo
+ * With thanks to Abdel-Rahim Adballa, Yousuf Mohammed-Ahmed and Dominic Lobo
  */
 package game;
 
@@ -63,13 +64,19 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int clearIntersectPoint = 640;
 	int highScore;
 	int onlineScore;
-	int[] treeX = {30, 40, 50, 60, 70};
-	int[] treeY = {50, 50, 70, 70, 90};
+	int treeX = 80;
+	int treeY = 460;
+	int[] treeX1 = {60, 75, 90};
+	int[] treeY1 = {520, 460, 520};
+	int[] treeX2 = {45, 75, 105};
+	int[] treeY2 = {565, 505, 565};
+	int[] treeX3 = {30, 75, 120};
+	int[] treeY3 = {610, 550, 610};
 
 	double cloudX = 20.0;
 	double cloudY = random.nextInt(100) + 40;
 	double terminalVelocity = 18.0;
-	double gravity = 9.81 ;
+	double gravity = 0.38 ;
 	double yVelocity = 0.0;
 	double cloudSpeed = 0.3;
 	double pipeSpeed = -2.0;
@@ -237,17 +244,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		g.setColor(cloudColour);
 		if ("Christmas".equals(modeOption)) { // set the theme when Christmas mode is selected
 			cloudY = 50;
-			try{
-			 BufferedImage image = ImageIO.read(new File("santa icon.png"));
-			 g.drawImage(image, xPos, yPosition, this);
-			}
-			catch(IOException e){
-				
-			}
+			
 			
 			for (int i = 0; i <= 1400; i += 100) { // set clouds to look like a typical overcast day (although with a blue sky)
-				paintOvals(g, cloudX, cloudY);
-				paintOvals(g, cloudX + i, cloudY);
+				paintClouds(g, cloudX, cloudY);
+				paintClouds(g, cloudX + i, cloudY);
 			}
 
 			for (int i = 0; i < 100; i++) { // initialise the snow
@@ -260,19 +261,24 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		} else {
 			g.setColor(cloudColour);
 			for (int i = 350; i <= 1400; i += 350) { // draw clouds
-				paintOvals(g, cloudX, cloudY);
-				paintOvals(g, cloudX + i, cloudY);
+				paintClouds(g, cloudX, cloudY);
+				paintClouds(g, cloudX + i, cloudY);
 			}
+		}
+		
+		for (int i = 80; i < 720; i += 80) { // TODO Make never ending trees!!!
+			g.setColor(new Color(161, 99, 0));
+			g.fillRect(65, 575, 24, 120);
+			g.setColor(new Color(18, 179, 0));
+			g.fillPolygon(treeX1, treeY1, treeX1.length);
+			g.fillPolygon(treeX2, treeY2, treeX2.length);
+			g.fillPolygon(treeX3, treeY3, treeX3.length);
 		}
 
 		g.setColor(pipeColour);
 		for (Rectangle p : pipe) { // draw pipes
 			g.fillRect(p.x, p.y, p.width, p.height);
-		}
-		
-		
-		//TODO Polygon attempt here
-		g.fillPolygon(treeX, treeY, treeX.length);
+		}		
 		
 
 		if (gameStarted) { // display box and score
@@ -280,6 +286,13 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			if(!(modeOption.equals("Christmas"))){
 				g.fillRect(box.x, box.y, box.width, box.height);
 			}
+			try{
+				 BufferedImage image = ImageIO.read(new File("santa icon.png"));
+				 g.drawImage(image, xPos, yPosition, this);
+				}
+				catch(IOException e){
+					
+				}
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial", Font.PLAIN, 35));
 			g.drawString(Integer.toString(score), 635, 30);
@@ -371,16 +384,21 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			pipeColour = new Color(0, 212, 49);
 			cloudColour = new Color(254, 251, 255);
 			delay = false;
+			
 			break;
 		}
 	}
 
-	public void paintOvals(Graphics g, double cloudX2, double cloudY2) { // draw
+	public void paintClouds(Graphics g, double cloudX2, double cloudY2) { // draw
 																			// a
 																			// cloud
 		g.fillOval((int) cloudX2 - 10, (int) cloudY2 - 42, 140, 55);
 		g.fillOval((int) cloudX2 + 30, (int) (cloudY2 - 70), 150, 65);
 		g.fillOval((int) cloudX2 - 32, (int) (cloudY2 - 80), 150, 70);
+
+	}
+	
+	public void paintTrees(Graphics g, int treeX, int treeY){
 
 	}
 
