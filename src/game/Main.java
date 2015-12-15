@@ -23,8 +23,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.security.Key;
 import java.util.Random;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -57,7 +60,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int xPos = 615;
 	int pipe1X = 1280;
 	int distPipes = 300;
-	int[] pipeX = { pipe1X, pipe1X + distPipes, pipe1X + (2 * distPipes), pipe1X + (3 * distPipes),	pipe1X + (4 * distPipes) };
+	int[] pipeX = { pipe1X, pipe1X + distPipes, pipe1X + (2 * distPipes),
+			pipe1X + (3 * distPipes), pipe1X + (4 * distPipes) };
 	int[] pipeY = new int[10];
 	int pipeGap = 635;
 	int pointAward = 1305;
@@ -66,17 +70,17 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int onlineScore;
 	int treeX = 80;
 	int treeY = 460;
-	int[] treeX1 = {60, 75, 90};
-	int[] treeY1 = {520, 460, 520};
-	int[] treeX2 = {45, 75, 105};
-	int[] treeY2 = {565, 505, 565};
-	int[] treeX3 = {30, 75, 120};
-	int[] treeY3 = {610, 550, 610};
+	int[] treeX1 = { 60, 75, 90 };
+	int[] treeY1 = { 520, 460, 520 };
+	int[] treeX2 = { 45, 75, 105 };
+	int[] treeY2 = { 565, 505, 565 };
+	int[] treeX3 = { 30, 75, 120 };
+	int[] treeY3 = { 610, 550, 610 };
 
 	double cloudX = 20.0;
 	double cloudY = random.nextInt(100) + 40;
 	double terminalVelocity = 18.0;
-	double gravity = 0.38 ;
+	double gravity = 0.38;
 	double yVelocity = 0.0;
 	double cloudSpeed = 0.3;
 	double pipeSpeed = -2.0;
@@ -93,7 +97,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	boolean exit = false;
 	boolean saveOptions = false;
 	boolean delay = false;
-	
+
 	Pipe object = new Pipe(pipeX[1], pipeY[1]);
 
 	File pointSFX = new File("Cleared.wav");
@@ -103,9 +107,13 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	String difficultyOption;
 	String colourOption;
 	String modeOption = "Normal";
+	String scoreString;
+	String text = scoreString;
+	String key = "Bar12345Bar12345";
 
 	String[] difficulty = { "Easy", "Normal", "Hard" };
-	String[] boxColour = { "Black", "Blue", "Green", "Grey", "Orange", "Pink", "Purple", "Red", "Yellow" };
+	String[] boxColour = { "Black", "Blue", "Green", "Grey", "Orange", "Pink",
+			"Purple", "Red", "Yellow" };
 	String[] mode = { "Normal", "Night", "High", "Drunk", "Christmas" };
 
 	JFrame optionsFrame = new JFrame("Options");
@@ -115,7 +123,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	JLabel difficultyLabel = new JLabel("Difficulty");
 	JLabel colourLabel = new JLabel("Colour");
 	JLabel modeLabel = new JLabel("Mode");
-	JLabel descriptionLabel= new JLabel();
+	JLabel descriptionLabel = new JLabel();
 
 	JComboBox<String> difficultyBox = new JComboBox<>(difficulty);
 	JComboBox<String> colourBox = new JComboBox<>(boxColour);
@@ -126,31 +134,50 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	Color backgroundColour;
 	Color pipeColour;
 	Color cloudColour;
+	
+	Key aesKey;
+	Cipher cipher;
+	byte[] encrypted;
 
 	public Main(String name) {
 		playerName = name;
+
+		try {
+			aesKey = new SecretKeySpec(key.getBytes(), "AES");
+		    cipher = Cipher.getInstance("AES");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		for (int i = 0; i < 10; i += 2) { // Initialise y axis for pipes
 			pipeY[i] = random.nextInt(600) - 600;
 			pipeY[i + 1] = pipeY[i] + pipeGap;
 		}
 
-		for (int i = 0; i < 200; i++) { // make stars randomly blotted on the screen
+		for (int i = 0; i < 200; i++) { // make stars randomly blotted on the
+										// screen
 			starsX[i] = random.nextInt(1280);
 			starsY[i] = random.nextInt(720);
 		}
 
-		for (int i = 0; i < 100; i++) { // make snow randomly blotted onto the screen
+		for (int i = 0; i < 100; i++) { // make snow randomly blotted onto the
+										// screen
 			snowX[i] = random.nextInt(1280);
 			snowY[i] = random.nextInt(720);
 		}
 
 		try { // see if HScore.txt exists
 
-			BufferedReader highScoreReader = new BufferedReader(new FileReader("HScore.txt"));
+			BufferedReader highScoreReader = new BufferedReader(new FileReader(
+					"HScore.txt"));
 			String s = highScoreReader.readLine();
+
+			decrypt();
+
 			highScore = Integer.parseInt(s);
 			System.out.println("Local high score: " + highScore);
+
 			highScoreReader.close();
 
 		} catch (Exception e) {
@@ -158,10 +185,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 
 		try {
-			BufferedReader or = new BufferedReader(new FileReader("Options.txt")); // see
-																					// if
-																					// Options.txt
-																					// exists
+			BufferedReader or = new BufferedReader(
+					new FileReader("Options.txt")); // see
+													// if
+													// Options.txt
+													// exists
 			colourOption = or.readLine();
 			System.out.println("Saved colour: " + colourOption);
 			or.close();
@@ -174,10 +202,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 
 		try {
-			BufferedReader difficultyReader = new BufferedReader(new FileReader("Difficulty.txt")); // see
-																									// if
-																									// Difficulty.txt
-																									// exists
+			BufferedReader difficultyReader = new BufferedReader(
+					new FileReader("Difficulty.txt")); // see
+														// if
+														// Difficulty.txt
+														// exists
 			difficultyOption = difficultyReader.readLine();
 			System.out.println("Saved difficulty: " + difficultyOption);
 			difficultyReader.close();
@@ -203,8 +232,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		Graphics2D g2d = (Graphics2D) g; // Anti-aliasing the drawn objects
 											// (smoothening the edges)
 
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		super.paintComponent(g2d);
 
 		for (int i = 0; i < 10; i += 2) { // initialise pipe y axis
@@ -221,10 +252,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		setMode(g);
 
-		g.setColor(backgroundColour); //draw the background
+		g.setColor(backgroundColour); // draw the background
 		g.fillRect(0, 0, 1280, 720);
 
-		if ("Night".equals(modeOption)) { // set the theme when night mode is selected
+		if ("Night".equals(modeOption)) { // set the theme when night mode is
+											// selected
 			g.setColor(new Color(240, 240, 240));
 
 			for (int i = 0; i < 200; i++) { // initialise stars
@@ -242,11 +274,14 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 
 		g.setColor(cloudColour);
-		if ("Christmas".equals(modeOption)) { // set the theme when Christmas mode is selected
+		if ("Christmas".equals(modeOption)) { // set the theme when Christmas
+												// mode is selected
 			cloudY = 50;
-			
-			
-			for (int i = 0; i <= 1400; i += 100) { // set clouds to look like a typical overcast day (although with a blue sky)
+
+			for (int i = 0; i <= 1400; i += 100) { // set clouds to look like a
+													// typical overcast day
+													// (although with a blue
+													// sky)
 				paintClouds(g, cloudX, cloudY);
 				paintClouds(g, cloudX + i, cloudY);
 			}
@@ -265,34 +300,46 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				paintClouds(g, cloudX + i, cloudY);
 			}
 		}
-		
-		for (int i = 80; i < 720; i += 80) { // TODO Make never ending trees!!!
+	
+
+		for (int i = 0; i <= 1200; i += 240) { // TODO Make never ending trees!!!
 			g.setColor(new Color(161, 99, 0));
 			g.fillRect(65, 575, 24, 120);
 			g.setColor(new Color(18, 179, 0));
 			g.fillPolygon(treeX1, treeY1, treeX1.length);
 			g.fillPolygon(treeX2, treeY2, treeX2.length);
 			g.fillPolygon(treeX3, treeY3, treeX3.length);
+			
+			g.setColor(new Color(161, 99, 0));
+			g.fillRect(65 + i, 575, 24, 120);
+			
+			for(int z : treeX1){
+				z += i;
+				g.setColor(new Color(18, 179, 0));
+				g.fillPolygon(treeX1, treeY1, treeX1.length);
+				g.fillPolygon(treeX2, treeY2, treeX2.length);
+				g.fillPolygon(treeX3, treeY3, treeX3.length);
+			}
+			
 		}
+		
 
 		g.setColor(pipeColour);
 		for (Rectangle p : pipe) { // draw pipes
 			g.fillRect(p.x, p.y, p.width, p.height);
-		}		
-		
+		}
 
 		if (gameStarted) { // display box and score
 			setColour(g);
-			if(!(modeOption.equals("Christmas"))){
+			if (!(modeOption.equals("Christmas"))) {
 				g.fillRect(box.x, box.y, box.width, box.height);
 			}
-			try{
-				 BufferedImage image = ImageIO.read(new File("santa icon.png"));
-				 g.drawImage(image, xPos, yPosition, this);
-				}
-				catch(IOException e){
-					
-				}
+			try {
+				BufferedImage image = ImageIO.read(new File("santa icon.png"));
+				g.drawImage(image, xPos, yPosition, this);
+			} catch (IOException e) {
+
+			}
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial", Font.PLAIN, 35));
 			g.drawString(Integer.toString(score), 635, 30);
@@ -325,9 +372,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 				try { // save high score to HScore.txt
 
-					String scoreString = Integer.toString(highScore);
+					scoreString = Integer.toString(highScore);
 
-					Writer highScoreWriter = new FileWriter("HScore.txt");
+					encrypt();
+
+					Writer highScoreWriter = new FileWriter("HScore");
 					highScoreWriter.write(scoreString);
 					System.out.println("New high score: " + scoreString);
 					highScoreWriter.close();
@@ -339,11 +388,12 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				}
 
 			}
-			//Display the 'game over' message
+			// Display the 'game over' message
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial", Font.PLAIN, 45));
 			g.drawString("You lose!", 545, 250);
-			g.drawString("Local High Score: " + Integer.toString(highScore), 450, 300);
+			g.drawString("Local High Score: " + Integer.toString(highScore),
+					450, 300);
 			g.drawString("Press enter to retry or esc to exit", 323, 350);
 			g.drawString("Press L to reveal the top scorer", 335, 400);
 			g.drawString("Press O to view options", 402, 450);
@@ -352,9 +402,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	}
 
 	public void setMode(Graphics g) { // TODO Set Theme
-	
-		switch (modeOption) { // Get what ever mode is selected and change things accordingly
-	
+
+		switch (modeOption) { // Get what ever mode is selected and change
+								// things accordingly
+
 		case "Normal":
 			backgroundColour = new Color(48, 179, 255);
 			pipeColour = new Color(0, 212, 49);
@@ -365,12 +416,15 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			backgroundColour = Color.BLACK;
 			pipeColour = new Color(0, 97, 24);
 			cloudColour = new Color(64, 61, 65);
-			delay = false;			
+			delay = false;
 			break;
 		case "High":
-			backgroundColour = new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255));
-			pipeColour = new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255));
-			cloudColour = new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255));
+			backgroundColour = new Color(random.nextInt(255),
+					random.nextInt(255), random.nextInt(255));
+			pipeColour = new Color(random.nextInt(255), random.nextInt(255),
+					random.nextInt(255));
+			cloudColour = new Color(random.nextInt(255), random.nextInt(255),
+					random.nextInt(255));
 			delay = false;
 			break;
 		case "Drunk":
@@ -384,7 +438,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			pipeColour = new Color(0, 212, 49);
 			cloudColour = new Color(254, 251, 255);
 			delay = false;
-			
+
 			break;
 		}
 	}
@@ -397,8 +451,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		g.fillOval((int) cloudX2 - 32, (int) (cloudY2 - 80), 150, 70);
 
 	}
-	
-	public void paintTrees(Graphics g, int treeX, int treeY){
+
+	public void paintTrees(Graphics g, int treeX, int treeY) {
 
 	}
 
@@ -427,9 +481,23 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 						try {
 							pObject.save();
-							JOptionPane.showMessageDialog(Frame.frame, "You have the best high score online!", // displays when the user gets the best score out of everyone
-									"Congratulations!", JOptionPane.DEFAULT_OPTION);
-							worldBestScore = "Online high score: " + pObject.getInt("Score") + "\n" + "User: "
+							JOptionPane.showMessageDialog(
+									Frame.frame,
+									"You have the best high score online!", // displays
+																			// when
+																			// the
+																			// user
+																			// gets
+																			// the
+																			// best
+																			// score
+																			// out
+																			// of
+																			// everyone
+									"Congratulations!",
+									JOptionPane.DEFAULT_OPTION);
+							worldBestScore = "Online high score: "
+									+ pObject.getInt("Score") + "\n" + "User: "
 									+ pObject.getString("User");
 
 						} catch (ParseException e1) {
@@ -437,7 +505,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 							e1.printStackTrace();
 						}
 					} else {
-						worldBestScore = "Online high score: " + pObject.getInt("Score") + "\n" + "User: "
+						worldBestScore = "Online high score: "
+								+ pObject.getInt("Score") + "\n" + "User: "
 								+ pObject.getString("User");
 						System.out.println(worldBestScore);
 						onlineScore = pObject.getInt("Score");
@@ -445,6 +514,63 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				}
 			}
 		});
+	}
+
+	public void encrypt() { // TODO Encryption
+		
+				try {
+
+					// 128 bit key
+
+					// Create key and cipher
+
+					// encrypt the text
+					scoreString = Integer.toString(highScore);
+					cipher.init(Cipher.ENCRYPT_MODE, aesKey);
+					encrypted = cipher.doFinal(scoreString.getBytes());
+					System.out.println(new String("Encrypted score: " + encrypted));
+
+					// decrypt the text
+					/*
+					 * cipher.init(Cipher.DECRYPT_MODE, aesKey); String
+					 * decrypted = new String(cipher.doFinal(encrypted));
+					 * System.out.println(decrypted);
+					 */
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+
+	}
+
+	public void decrypt() { // TODO Decryption
+
+
+				try {
+
+					String text = scoreString;
+					String key = "Bar12345Bar12345"; // 128 bit key
+					System.out.println(text);
+
+					// Create key and cipher
+					Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
+					Cipher cipher = Cipher.getInstance("AES");
+
+					// encrypt the text
+					/* cipher.init(Cipher.ENCRYPT_MODE, aesKey); */
+					// encrypted = cipher.doFinal(text.getBytes());
+					// System.out.println(new String(encrypted));
+
+					// decrypt the text
+					cipher.init(Cipher.DECRYPT_MODE, aesKey);
+					String decrypted = new String(cipher.doFinal(encrypted));
+					System.out.println(decrypted);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -460,13 +586,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 		yPosition += yVelocity; // make the ball's position move
 
-		if (pointAward <= 640) {
-			score++;
+		if (pointAward <= 640) { // add a point each time the box goes through the pipe
+			score+= 206;
 			pointAward += 300;
 			// soundEffect();
 		}
-
-		
 
 		if (delay) { // slows everything down when drunk mode is selected
 			pipeSpeed = -1;
@@ -506,7 +630,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		}
 
-		for (int i = 0; i < 5; i++) { // make the pipes come at a set space and at a random y position
+		for (int i = 0; i < 5; i++) { // make the pipes come at a set space and
+										// at a random y position
 			if (pipeX[i] <= -50) {
 				if (i != 0) {
 					pipeX[i] = pipeX[i - 1] + 300;
@@ -518,7 +643,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			}
 		}
 
-		if ("Christmas".equals(modeOption)) { // Makes the clouds look like they are infinite
+		if ("Christmas".equals(modeOption)) { // Makes the clouds look like they
+												// are infinite
 			if (cloudX <= -185) {
 				cloudX = -85;
 			}
@@ -530,7 +656,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	}
 
 	public void displayMenu(Graphics g) {
-		if (!gameStarted && highScore != 0 && !gameOver) { // displays starting menu
+		if (!gameStarted && highScore != 0 && !gameOver) { // displays starting
+															// menu
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial ", Font.PLAIN, 45));
 			g.drawString("Bouncy Box", 510, 100);
@@ -559,7 +686,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			@Override
 			public void run() {
 				try {
-					AudioInputStream inputStream = AudioSystem.getAudioInputStream(pointSFX);
+					AudioInputStream inputStream = AudioSystem
+							.getAudioInputStream(pointSFX);
 					Clip clip = AudioSystem.getClip();
 					clip.open(inputStream);
 					clip.start();
@@ -620,36 +748,49 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		colourLabel.setForeground(Color.RED);
 		modeLabel.setBounds(20, 100, 70, 20);
 		modeLabel.setForeground(Color.RED);
-		descriptionLabel.setBounds(20,140,180,45);
+		descriptionLabel.setBounds(20, 140, 180, 45);
 		descriptionLabel.setForeground(Color.RED);
-		
-		modeBox.addItemListener(new ItemListener(){
+
+		modeBox.addItemListener(new ItemListener() {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				modeOption = (String) e.getItem();
-				if(modeOption.equals("Normal")){ 
-					descriptionLabel.setText("<html>Normal: Try to bounce the box<br>through the gap between the<br>pipes.</html>"); //description of the mode
-				}
-				else if(modeOption.equals("Night")){
-					descriptionLabel.setText("<html>Night: Don't get distracted<br>by all the pretty stars!<br>(P.S. black isn't a good colour)</html>"); //description of the mode
-				}
-				else if(modeOption.equals("High")){
-					descriptionLabel.setText("<html>High: Things don't quite look right... (WARNING: contains<br> flasing images...)</html>"); //description of the mode
-				}
-				else if(modeOption.equals("Drunk")){
-					descriptionLabel.setText("<html>Drunk:\nDrink tends to slow<br>your reactions down....</html>"); //description of the mode
-				}
-				else if(modeOption.equals("Christmas")){
-					descriptionLabel.setText("<html>Christmas: 'Snow is falling... <br>all around you...'</html>"); //description of the mode
+				if (modeOption.equals("Normal")) {
+					descriptionLabel
+							.setText("<html>Normal: Try to bounce the box<br>through the gap between the<br>pipes.</html>"); // description
+																																// of
+																																// the
+																																// mode
+				} else if (modeOption.equals("Night")) {
+					descriptionLabel
+							.setText("<html>Night: Don't get distracted<br>by all the pretty stars!<br>(P.S. black isn't a good colour)</html>"); // description
+																																					// of
+																																					// the
+																																					// mode
+				} else if (modeOption.equals("High")) {
+					descriptionLabel
+							.setText("<html>High: Things don't quite look right... (WARNING: contains<br> flasing images...)</html>"); // description
+																																		// of
+																																		// the
+																																		// mode
+				} else if (modeOption.equals("Drunk")) {
+					descriptionLabel
+							.setText("<html>Drunk:\nDrink tends to slow<br>your reactions down....</html>"); // description
+																												// of
+																												// the
+																												// mode
+				} else if (modeOption.equals("Christmas")) {
+					descriptionLabel
+							.setText("<html>Christmas: 'Snow is falling... <br>all around you...'</html>"); // description
+																											// of
+																											// the
+																											// mode
 				}
 			}
-			
+
 		});
-		
-		
-		
-		
+
 		difficultyBox.setBounds(80, 20, 90, 20);
 		difficultyBox.setBackground(Color.WHITE);
 		difficultyBox.setForeground(Color.RED);
@@ -702,7 +843,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 					}
 
 					try {
-						Writer difficultyWriter = new FileWriter("Difficulty.txt");
+						Writer difficultyWriter = new FileWriter(
+								"Difficulty.txt");
 						difficultyWriter.write(difficultyOption);
 						difficultyWriter.close();
 					} catch (Exception e2) {
@@ -797,7 +939,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			}
 
 			if (c == KeyEvent.VK_L) { // shows online top scorer
-				JOptionPane.showMessageDialog(Frame.frame, worldBestScore, "Top scorer", JOptionPane.PLAIN_MESSAGE);
+				JOptionPane.showMessageDialog(Frame.frame, worldBestScore,
+						"Top scorer", JOptionPane.PLAIN_MESSAGE);
 			}
 
 			if (c == KeyEvent.VK_O) { // display options menu
