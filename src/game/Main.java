@@ -76,6 +76,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int[] treeY2 = { 565, 505, 565 };
 	int[] treeX3 = { 30, 75, 120 };
 	int[] treeY3 = { 610, 550, 610 };
+	
 
 	double cloudX = 20.0;
 	double cloudY = random.nextInt(100) + 40;
@@ -134,7 +135,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	Color backgroundColour;
 	Color pipeColour;
 	Color cloudColour;
-	
+
 	Key aesKey;
 	Cipher cipher;
 	byte[] encrypted;
@@ -144,8 +145,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		try {
 			aesKey = new SecretKeySpec(key.getBytes(), "AES");
-		    cipher = Cipher.getInstance("AES");
-			
+			cipher = Cipher.getInstance("AES");
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -300,29 +301,29 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				paintClouds(g, cloudX + i, cloudY);
 			}
 		}
-	
 
-		for (int i = 0; i <= 1200; i += 240) { // TODO Make never ending trees!!!
+		/*for (int i = 240; i <= 1200; i += 240) { // TODO Make never ending
+													// trees!!!
 			g.setColor(new Color(161, 99, 0));
 			g.fillRect(65, 575, 24, 120);
 			g.setColor(new Color(18, 179, 0));
 			g.fillPolygon(treeX1, treeY1, treeX1.length);
 			g.fillPolygon(treeX2, treeY2, treeX2.length);
 			g.fillPolygon(treeX3, treeY3, treeX3.length);
-			
-			g.setColor(new Color(161, 99, 0));
-			g.fillRect(65 + i, 575, 24, 120);
-			
-			for(int z : treeX1){
-				z += i;
+
+			for (int x = 0; x < treeX1.length; x++) {
+				treeX1[x] += i;
+				treeX2[x] += i;
+				treeX3[x] += i;
+				g.setColor(new Color(161, 99, 0));
+				g.fillRect(65 + i, 575, 24, 120);
 				g.setColor(new Color(18, 179, 0));
 				g.fillPolygon(treeX1, treeY1, treeX1.length);
 				g.fillPolygon(treeX2, treeY2, treeX2.length);
 				g.fillPolygon(treeX3, treeY3, treeX3.length);
 			}
-			
-		}
-		
+
+		}*/
 
 		g.setColor(pipeColour);
 		for (Rectangle p : pipe) { // draw pipes
@@ -333,12 +334,14 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			setColour(g);
 			if (!(modeOption.equals("Christmas"))) {
 				g.fillRect(box.x, box.y, box.width, box.height);
-			}
-			try {
-				BufferedImage image = ImageIO.read(new File("santa icon.png"));
-				g.drawImage(image, xPos, yPosition, this);
-			} catch (IOException e) {
+			} else {
+				try {
+					BufferedImage image = ImageIO.read(new File(
+							"santa icon.png"));
+					g.drawImage(image, xPos, yPosition, this);
+				} catch (IOException e) {
 
+				}
 			}
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial", Font.PLAIN, 35));
@@ -517,59 +520,56 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	}
 
 	public void encrypt() { // TODO Encryption
-		
-				try {
 
-					// 128 bit key
+		try {
 
-					// Create key and cipher
+			// 128 bit key
 
-					// encrypt the text
-					scoreString = Integer.toString(highScore);
-					cipher.init(Cipher.ENCRYPT_MODE, aesKey);
-					encrypted = cipher.doFinal(scoreString.getBytes());
-					System.out.println(new String("Encrypted score: " + encrypted));
+			// Create key and cipher
 
-					// decrypt the text
-					/*
-					 * cipher.init(Cipher.DECRYPT_MODE, aesKey); String
-					 * decrypted = new String(cipher.doFinal(encrypted));
-					 * System.out.println(decrypted);
-					 */
+			// encrypt the text
+			scoreString = Integer.toString(highScore);
+			cipher.init(Cipher.ENCRYPT_MODE, aesKey);
+			encrypted = cipher.doFinal(scoreString.getBytes());
+			System.out.println(new String("Encrypted score: " + encrypted));
 
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			// decrypt the text
+			/*
+			 * cipher.init(Cipher.DECRYPT_MODE, aesKey); String decrypted = new
+			 * String(cipher.doFinal(encrypted)); System.out.println(decrypted);
+			 */
 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 
 	public void decrypt() { // TODO Decryption
 
+		try {
 
-				try {
+			String text = scoreString;
+			String key = "Bar12345Bar12345"; // 128 bit key
+			System.out.println(text);
 
-					String text = scoreString;
-					String key = "Bar12345Bar12345"; // 128 bit key
-					System.out.println(text);
+			// Create key and cipher
+			Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
+			Cipher cipher = Cipher.getInstance("AES");
 
-					// Create key and cipher
-					Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
-					Cipher cipher = Cipher.getInstance("AES");
+			// encrypt the text
+			/* cipher.init(Cipher.ENCRYPT_MODE, aesKey); */
+			// encrypted = cipher.doFinal(text.getBytes());
+			// System.out.println(new String(encrypted));
 
-					// encrypt the text
-					/* cipher.init(Cipher.ENCRYPT_MODE, aesKey); */
-					// encrypted = cipher.doFinal(text.getBytes());
-					// System.out.println(new String(encrypted));
+			// decrypt the text
+			cipher.init(Cipher.DECRYPT_MODE, aesKey);
+			String decrypted = new String(cipher.doFinal(encrypted));
+			System.out.println(decrypted);
 
-					// decrypt the text
-					cipher.init(Cipher.DECRYPT_MODE, aesKey);
-					String decrypted = new String(cipher.doFinal(encrypted));
-					System.out.println(decrypted);
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -586,8 +586,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		}
 		yPosition += yVelocity; // make the ball's position move
 
-		if (pointAward <= 640) { // add a point each time the box goes through the pipe
-			score+= 206;
+		if (pointAward <= 640) { // add a point each time the box goes through
+									// the pipe
+			score += 206;
 			pointAward += 300;
 			// soundEffect();
 		}
