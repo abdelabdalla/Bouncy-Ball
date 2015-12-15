@@ -277,7 +277,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		g.setColor(pipeColour);
 		for (Rectangle p : pipe) { // draw pipes
-			g.fillRect(p.x, p.y, p.width, p.height);
+			g.fill3DRect(p.x, p.y, p.width, p.height, true);
 		}		
 		
 
