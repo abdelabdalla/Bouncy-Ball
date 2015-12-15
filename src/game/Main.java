@@ -76,7 +76,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int[] treeY2 = { 565, 505, 565 };
 	int[] treeX3 = { 30, 75, 120 };
 	int[] treeY3 = { 610, 550, 610 };
-	
+	int commitPls;
 
 	double cloudX = 20.0;
 	double cloudY = random.nextInt(100) + 40;
