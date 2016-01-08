@@ -70,13 +70,13 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int onlineScore;
 	int treeX = 80;
 	int treeY = 460;
+	int twinkle;
 	int[] treeX1 = { 60, 75, 90 };
 	int[] treeY1 = { 520, 460, 520 };
 	int[] treeX2 = { 45, 75, 105 };
 	int[] treeY2 = { 565, 505, 565 };
 	int[] treeX3 = { 30, 75, 120 };
 	int[] treeY3 = { 610, 550, 610 };
-	int commitPls;
 
 	double cloudX = 20.0;
 	double cloudY = random.nextInt(100) + 40;
@@ -112,7 +112,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	String text = scoreString;
 	String key = "Bar12345Bar12345";
 
-	String[] difficulty = { "Easy", "Normal", "Hard" };
+	String[] difficulty = { "Easy", "Normal", "Hard", "Impossible" };
 	String[] boxColour = { "Black", "Blue", "Green", "Grey", "Orange", "Pink",
 			"Purple", "Red", "Yellow" };
 	String[] mode = { "Normal", "Night", "High", "Drunk", "Christmas" };
@@ -136,20 +136,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	Color pipeColour;
 	Color cloudColour;
 
-	Key aesKey;
-	Cipher cipher;
-	byte[] encrypted;
 
 	public Main(String name) {
 		playerName = name;
-
-		try {
-			aesKey = new SecretKeySpec(key.getBytes(), "AES");
-			cipher = Cipher.getInstance("AES");
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
 		for (int i = 0; i < 10; i += 2) { // Initialise y axis for pipes
 			pipeY[i] = random.nextInt(600) - 600;
@@ -174,14 +163,13 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 					"HScore.txt"));
 			String s = highScoreReader.readLine();
 
-			decrypt();
-
 			highScore = Integer.parseInt(s);
 			System.out.println("Local high score: " + highScore);
 
 			highScoreReader.close();
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			highScore = 0;
 		}
 
@@ -257,17 +245,24 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		g.fillRect(0, 0, 1280, 720);
 
 		if ("Night".equals(modeOption)) { // set the theme when night mode is
-											// selected
-			g.setColor(new Color(240, 240, 240));
-
+											// selected			
+			
+			
 			for (int i = 0; i < 200; i++) { // initialise stars
+				
 				stars[i] = new Rectangle((int) starsX[i], (int) starsY[i], 2, 2);
 			}
-
+			
+			
+			
 			for (Rectangle p : stars) { // draw stars
+				twinkle = random.nextInt(255);
+				g.setColor(new Color(twinkle, twinkle, twinkle));
+				
 				g.fillOval(p.x, p.y, p.width, p.height);
 			}
 
+			g.setColor(Color.WHITE);
 			g.fillOval(140, 50, 150, 150); // draw the moon
 			g.setColor(Color.BLACK);
 			g.fillOval(158, 42, 150, 150);
@@ -376,12 +371,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				try { // save high score to HScore.txt
 
 					scoreString = Integer.toString(highScore);
-
-					encrypt();
-
-					Writer highScoreWriter = new FileWriter("HScore");
-					highScoreWriter.write(scoreString);
 					System.out.println("New high score: " + scoreString);
+
+					Writer highScoreWriter = new FileWriter("HScore.txt");
+					highScoreWriter.write(scoreString);
+					System.out.println("Saved high score: " + scoreString);
 					highScoreWriter.close();
 
 				} catch (IOException e) {
@@ -519,59 +513,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		});
 	}
 
-	public void encrypt() { // TODO Encryption
 
-		try {
-
-			// 128 bit key
-
-			// Create key and cipher
-
-			// encrypt the text
-			scoreString = Integer.toString(highScore);
-			cipher.init(Cipher.ENCRYPT_MODE, aesKey);
-			encrypted = cipher.doFinal(scoreString.getBytes());
-			System.out.println(new String("Encrypted score: " + encrypted));
-
-			// decrypt the text
-			/*
-			 * cipher.init(Cipher.DECRYPT_MODE, aesKey); String decrypted = new
-			 * String(cipher.doFinal(encrypted)); System.out.println(decrypted);
-			 */
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public void decrypt() { // TODO Decryption
-
-		try {
-
-			String text = scoreString;
-			String key = "Bar12345Bar12345"; // 128 bit key
-			System.out.println(text);
-
-			// Create key and cipher
-			Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
-			Cipher cipher = Cipher.getInstance("AES");
-
-			// encrypt the text
-			/* cipher.init(Cipher.ENCRYPT_MODE, aesKey); */
-			// encrypted = cipher.doFinal(text.getBytes());
-			// System.out.println(new String(encrypted));
-
-			// decrypt the text
-			cipher.init(Cipher.DECRYPT_MODE, aesKey);
-			String decrypted = new String(cipher.doFinal(encrypted));
-			System.out.println(decrypted);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
 
 	public void actionPerformed(ActionEvent e) {
 
@@ -588,7 +530,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		if (pointAward <= 640) { // add a point each time the box goes through
 									// the pipe
-			score += 206;
+			score++;
 			pointAward += 300;
 			// soundEffect();
 		}
@@ -751,6 +693,23 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		modeLabel.setForeground(Color.RED);
 		descriptionLabel.setBounds(20, 140, 180, 45);
 		descriptionLabel.setForeground(Color.RED);
+		
+		difficultyBox.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				difficultyOption = (String) e.getItem();
+				if (difficultyOption.equals("Impossible")) {
+					descriptionLabel
+					.setText("<html>Impossible: This is for no one only...</html>");
+				} else {
+					descriptionLabel
+					.setText("");
+				}
+				
+			}
+			
+		});
 
 		modeBox.addItemListener(new ItemListener() {
 
