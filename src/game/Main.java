@@ -60,8 +60,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int xPos = 615;
 	int pipe1X = 1280;
 	int distPipes = 300;
-	int[] pipeX = { pipe1X, pipe1X + distPipes, pipe1X + (2 * distPipes),
-			pipe1X + (3 * distPipes), pipe1X + (4 * distPipes) };
+	int[] pipeX = { pipe1X, pipe1X + distPipes, pipe1X + (2 * distPipes), pipe1X + (3 * distPipes),
+			pipe1X + (4 * distPipes) };
 	int[] pipeY = new int[10];
 	int pipeGap;
 	int pointAward = 1305;
@@ -115,10 +115,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	String colourOption;
 	String modeOption = "Normal";
 	String[] scoreStrings = new String[6];
-	String[] difficulty = { "Very Easy", "Easy", "Normal", "Hard",
-			"Impossible", "Don't even try" };
-	String[] boxColour = { "Black", "Blue", "Green", "Grey", "Orange", "Pink",
-			"Purple", "Red", "Yellow" };
+	String[] difficulty = { "Very Easy", "Easy", "Normal", "Hard", "Impossible", "Don't even try" };
+	String[] boxColour = { "Black", "Blue", "Green", "Grey", "Orange", "Pink", "Purple", "Red", "Yellow" };
 	String[] mode = { "Normal", "Night", "High", "Drunk", "Christmas", "Easter" };
 
 	JFrame optionsFrame = new JFrame("Options");
@@ -144,23 +142,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	public Main(String name) {
 		playerName = name;
 
-		/*
-		 * setLayout(null);
-		 * 
-		 * snoopLabel.setBounds(20, 500, 100, 200);
-		 * snoopLabel.setBackground(null); snoopLabel.setIcon(new
-		 * ImageIcon(((ImageIcon) snoop).getImage().getScaledInstance(100, 200,
-		 * Image.SCALE_DEFAULT)));
-		 * 
-		 * add(snoopLabel);
-		 */
-
 		try {
-			BufferedReader difficultyReader = new BufferedReader(
-					new FileReader("Difficulty.txt")); // see
-														// if
-														// Difficulty.txt
-														// exists
+			BufferedReader difficultyReader = new BufferedReader(new FileReader("Difficulty.txt")); // see
+																									// if
+																									// Difficulty.txt
+																									// exists
 			difficultyOption = difficultyReader.readLine();
 			System.out.println("Saved difficulty: " + difficultyOption);
 			difficultyBox.setSelectedItem(difficultyOption);
@@ -200,27 +186,61 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			snowY[i] = random.nextInt(720);
 		}
 
-		try { // see if HScore.txt exists
+		for (int i = 0; i < 6; i++) { // Load up individual high scores
 
-			BufferedReader highScoreReader = new BufferedReader(new FileReader(
-					"HScore.txt"));
-			String s = highScoreReader.readLine();
+			iDiff = i;
+			String[] s = new String[6];
 
-			highScore = Integer.parseInt(s);
-			System.out.println("Local high score: " + highScore);
+			try {
 
-			highScoreReader.close();
+				BufferedReader r;
 
-		} catch (Exception e) {
-			highScore = 0;
+				switch (iDiff) {
+				case 0:
+					r = new BufferedReader(new FileReader("Very Easy.txt"));
+					s[0] = r.readLine();
+					allHighScores[iDiff] = Integer.parseInt(s[0]);
+					break;
+				case 1:
+					r = new BufferedReader(new FileReader("Easy.txt"));
+					s[1] = r.readLine();
+					allHighScores[iDiff] = Integer.parseInt(s[1]);
+					break;
+				case 2:
+					r = new BufferedReader(new FileReader("Normal.txt"));
+					s[2] = r.readLine();
+					allHighScores[iDiff] = Integer.parseInt(s[2]);
+					break;
+				case 3:
+					r = new BufferedReader(new FileReader("Hard.txt"));
+					s[3] = r.readLine();
+					allHighScores[iDiff] = Integer.parseInt(s[3]);
+					break;
+				case 4:
+					r = new BufferedReader(new FileReader("Impossible.txt"));
+					s[4] = r.readLine();
+					allHighScores[iDiff] = Integer.parseInt(s[4]);
+					break;
+				case 5:
+					r = new BufferedReader(new FileReader("Don't even try.txt"));
+					s[5] = r.readLine();
+					allHighScores[iDiff] = Integer.parseInt(s[5]);
+					break;
+				}
+
+			} catch (Exception e) {
+				allHighScores[i] = 0;
+			}
+
+			System.out.println(iDiff + ": " + allHighScores[i]);
+
 		}
 
 		try {
-			BufferedReader or = new BufferedReader(
-					new FileReader("Options.txt")); // see
-													// if
-													// Options.txt
-													// exists
+			BufferedReader or = new BufferedReader(new FileReader("Options.txt")); // see
+																					// if
+																					// Options.txt
+																					// exists
 			colourOption = or.readLine();
 			System.out.println("Saved colour: " + colourOption);
 			or.close();
@@ -246,14 +266,12 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		Graphics2D g2d = (Graphics2D) g; // Anti-aliasing the drawn objects
 											// (smoothening the edges)
 
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		super.paintComponent(g2d);
 
 		for (int i = 0; i < 10; i += 2) {// initialise pipe y axis
-
+			setPipeGap();
 			while (pipeY[i] < -500) {
 				pipeY[i] = random.nextInt(600) - 600;
 				pipeY[i + 1] = pipeY[i] + pipeGap;
@@ -330,7 +348,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		if (gameStarted) { // display box and score
 			setColour(g);
 
-			if (modeOption.equals("High")) {
+			if (modeOption.equals("High")) {	// Welcome Snoop Dogg to the team!
 				Image image = ((ImageIcon) snoop).getImage();
 				g.drawImage(image, (int) snoopX, (int) snoopY, 100, 200, this);
 
@@ -340,8 +358,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				g.fillRect(box.x, box.y, box.width, box.height);
 			} else {
 				try {
-					BufferedImage image = ImageIO.read(new File(
-							"santa icon.png"));
+					BufferedImage image = ImageIO.read(new File("santa icon.png"));
 					g.drawImage(image, xPos, yPosition, this);
 				} catch (IOException e) {
 
@@ -381,56 +398,52 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 				System.out.println("High score on that difficulty");
 
-				try { // save high score to HScore.txt
+				try { // save individual high scores
 
-					scoreStrings[iDiff] = Integer
-							.toString(allHighScores[iDiff]);
+					scoreStrings[iDiff] = Integer.toString(allHighScores[iDiff]);
 
-					System.out.println("New high score: "
-							+ allHighScores[iDiff]);
+					System.out.println("Difficulty: " + iDiff);
 
 					Writer highScoreWriter;
 
-					switch (allHighScores[iDiff]) {
-						case 0:
-							highScoreWriter = new FileWriter("Very Easy.txt");
-							highScoreWriter.write(scoreStrings[iDiff]);
-							System.out.println("Saved high score: " + scoreStrings);
-							highScoreWriter.close();
-							break;
-						case 1:
-							highScoreWriter = new FileWriter("Easy.txt");
-							highScoreWriter.write(scoreStrings[iDiff]);
-							System.out.println("Saved high score: " + scoreStrings);
-							highScoreWriter.close();
-							break;
-						case 2:
-							highScoreWriter = new FileWriter("Normal.txt");
-							highScoreWriter.write(scoreStrings[iDiff]);
-							System.out.println("Saved high score: " + scoreStrings);
-							highScoreWriter.close();
-							break;
-						case 3:
-							highScoreWriter = new FileWriter("Hard.txt");
-							highScoreWriter.write(scoreStrings[iDiff]);
-							System.out.println("Saved high score: " + scoreStrings);
-							highScoreWriter.close();
-							break;
-						case 4:
-							highScoreWriter = new FileWriter("Impossible.txt");
-							highScoreWriter.write(scoreStrings[iDiff]);
-							System.out.println("Saved high score: " + scoreStrings);
-							highScoreWriter.close();
-							break;
-						case 5:
-							highScoreWriter = new FileWriter("Don't even try.txt");
-							highScoreWriter.write(scoreStrings[iDiff]);
-							System.out.println("Saved high score: " + scoreStrings);
-							highScoreWriter.close();
-							break;
+					switch (iDiff) {
+					case 0:
+						highScoreWriter = new FileWriter("Very Easy.txt");
+						highScoreWriter.write(scoreStrings[iDiff]);
+						System.out.println("Very easy high score: " + scoreStrings[iDiff]);
+						highScoreWriter.close();
+						break;
+					case 1:
+						highScoreWriter = new FileWriter("Easy.txt");
+						highScoreWriter.write(scoreStrings[iDiff]);
+						System.out.println("Easy high score: " + scoreStrings[iDiff]);
+						highScoreWriter.close();
+						break;
+					case 2:
+						highScoreWriter = new FileWriter("Normal.txt");
+						highScoreWriter.write(scoreStrings[iDiff]);
+						System.out.println("Normal high score: " + scoreStrings[iDiff]);
+						highScoreWriter.close();
+						break;
+					case 3:
+						highScoreWriter = new FileWriter("Hard.txt");
+						highScoreWriter.write(scoreStrings[iDiff]);
+						System.out.println("Hard high score: " + scoreStrings[iDiff]);
+						highScoreWriter.close();
+						break;
+					case 4:
+						highScoreWriter = new FileWriter("Impossible.txt");
+						highScoreWriter.write(scoreStrings[iDiff]);
+						System.out.println("Impossible high score: " + scoreStrings[iDiff]);
+						highScoreWriter.close();
+						break;
+					case 5:
+						highScoreWriter = new FileWriter("Don't even try.txt");
+						highScoreWriter.write(scoreStrings[iDiff]);
+						System.out.println("Don't even try high score: " + scoreStrings[iDiff]);
+						highScoreWriter.close();
+						break;
 					}
-
-					
 
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -443,9 +456,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial", Font.PLAIN, 45));
 			g.drawString("You lose!", 545, 250);
-			g.drawString(
-					"Local High Score: "
-							+ Integer.toString(allHighScores[iDiff]), 450, 300);
+			g.drawString("Local High Score: " + Integer.toString(allHighScores[iDiff]), 450, 300);
 			g.drawString("Press enter to retry or esc to exit", 323, 350);
 			g.drawString("Press L to reveal the top scorer", 335, 400);
 			g.drawString("Press O to view options", 402, 450);
@@ -453,7 +464,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 	}
 
-	public void setMode(Graphics g) { // TODO Set Theme
+	public void setMode(Graphics g) {
 
 		switch (modeOption) { // Get what ever mode is selected and change
 								// things accordingly
@@ -471,12 +482,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			delay = false;
 			break;
 		case "High":
-			backgroundColour = new Color(random.nextInt(255),
-					random.nextInt(255), random.nextInt(255));
-			pipeColour = new Color(random.nextInt(255), random.nextInt(255),
-					random.nextInt(255));
-			cloudColour = new Color(random.nextInt(255), random.nextInt(255),
-					random.nextInt(255));
+			backgroundColour = new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255));
+			pipeColour = new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255));
+			cloudColour = new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255));
 			delay = false;
 			break;
 		case "Drunk":
@@ -491,7 +499,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			cloudColour = new Color(254, 251, 255);
 			delay = false;
 			break;
-		case "Easter":
+		case "Easter": //TODO Easter mode
 
 			break;
 		}
@@ -535,23 +543,19 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 						try {
 							pObject.save();
-							JOptionPane.showMessageDialog(
-									Frame.frame,
-									"You have the best high score online!", // displays
-																			// when
-																			// the
-																			// user
-																			// gets
-																			// the
-																			// best
-																			// score
-																			// out
-																			// of
-																			// everyone
-									"Congratulations!",
-									JOptionPane.DEFAULT_OPTION);
-							worldBestScore = "Online high score: "
-									+ pObject.getInt("Score") + "\n" + "User: "
+							JOptionPane.showMessageDialog(Frame.frame, "You have the best high score online!", // displays
+																												// when
+																												// the
+																												// user
+																												// gets
+																												// the
+																												// best
+																												// score
+																												// out
+																												// of
+																												// everyone
+									"Congratulations!", JOptionPane.DEFAULT_OPTION);
+							worldBestScore = "Online high score: " + pObject.getInt("Score") + "\n" + "User: "
 									+ pObject.getString("User");
 
 						} catch (ParseException e1) {
@@ -559,8 +563,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 							e1.printStackTrace();
 						}
 					} else {
-						worldBestScore = "Online high score: "
-								+ pObject.getInt("Score") + "\n" + "User: "
+						worldBestScore = "Online high score: " + pObject.getInt("Score") + "\n" + "User: "
 								+ pObject.getString("User");
 						System.out.println(worldBestScore);
 						onlineScore = pObject.getInt("Score");
@@ -668,15 +671,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		}
 
-		if ("Don't even try".equals(difficultyOption)) {
-
-			pipeSpeed = -2.0;
-
-			for (int i = 0; i <= 4; i++) {
-				pipeX[i] += pipeSpeed;
-			}
-			pointAward += pipeSpeed;
-			cloudX -= cloudSpeed;
+		if ("Don't even try".equals(difficultyOption)) { //TODO Faster moving pipes
 
 			for (int i = 0; i < 10; i += 2) {
 				if (pipeY[i] <= -490 || pipeY[i] >= 0) {
@@ -684,29 +679,39 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 					pipeYSpeed[i + 1] *= -1;
 					pipeY[i] += pipeYSpeed[i];
 					pipeY[i + 1] += pipeYSpeed[i + 1];
-
 				}
 
 				pipeY[i] += pipeYSpeed[i];
 				pipeY[i + 1] += pipeYSpeed[i + 1];
 			}
+			
 		}
 
 		repaint();
 	}
 
 	public void displayMenu(Graphics g) {
-		if (!gameStarted && highScore != 0 && !gameOver) { // displays starting
-															// menu
-			g.setColor(Color.RED);
-			g.setFont(new Font("Arial ", Font.PLAIN, 45));
-			g.drawString("Bouncy Box", 510, 100);
-			g.drawString("Press space to begin", 420, 300);
-			g.drawString("Press O to view options", 402, 350);
 
-		} else if (!gameStarted && highScore == 0 && !gameOver) { // at start of
-																	// first
-																	// ever use
+		boolean newUser = true;
+
+		if (allHighScores[0] != 0 || allHighScores[1] != 0 || allHighScores[2] != 0 || allHighScores[3] != 0 || 
+				allHighScores[4] != 0 || allHighScores[5] != 0) {
+			if (!gameStarted && !gameOver) { // displays
+												// starting
+												// menu
+				g.setColor(Color.RED);
+				g.setFont(new Font("Arial ", Font.PLAIN, 45));
+				g.drawString("Bouncy Box", 510, 100);
+				g.drawString("Press space to begin", 420, 300);
+				g.drawString("Press O to view options", 402, 350);
+				newUser = false;
+
+			}
+		} else if (!gameStarted && newUser && !gameOver) { // at
+															// start
+															// of
+															// first
+															// use
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial", Font.PLAIN, 45));
 			g.drawString("Bouncy Box", 510, 100);
@@ -716,6 +721,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.drawString("Press space to begin", 420, 400);
 			g.drawString("Press O to view options", 402, 450);
 		}
+
 	}
 
 	public void soundEffect() { // method which is called to play a sound when
@@ -726,8 +732,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			@Override
 			public void run() {
 				try {
-					AudioInputStream inputStream = AudioSystem
-							.getAudioInputStream(pointSFX);
+					AudioInputStream inputStream = AudioSystem.getAudioInputStream(pointSFX);
 					Clip clip = AudioSystem.getClip();
 					clip.open(inputStream);
 					clip.start();
@@ -797,41 +802,37 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			public void itemStateChanged(ItemEvent e) {
 				modeOption = (String) e.getItem();
 				if (modeOption.equals("Normal")) {
-					descriptionLabel
-							.setText("<html>Normal: The default mode for a simple playing experience"); // description
-																										// of
-																										// the
-																										// mode
+					descriptionLabel.setText("<html>Normal: The default mode for a simple playing experience"); // description
+																												// of
+																												// the
+																												// mode
 				} else if (modeOption.equals("Night")) {
-					descriptionLabel
-							.setText("<html>Night: Don't get distracted by all the pretty stars! (P.S. black isn't a good colour)"); // description
-																																		// of
-																																		// the
-																																		// mode
+					descriptionLabel.setText(
+							"<html>Night: Don't get distracted by all the pretty stars! (P.S. black isn't a good colour)"); // description
+																															// of
+																															// the
+																															// mode
 				} else if (modeOption.equals("High")) {
-					descriptionLabel
-							.setText("<html>High: You might've had a bit too much to smoke... (WARNING: contains flasing images...)"); // description
-																																		// of
-																																		// the
-																																		// mode
+					descriptionLabel.setText(
+							"<html>High: You might've had a bit too much to smoke... (WARNING: contains flasing images...)"); // description
+																																// of
+																																// the
+																																// mode
 				} else if (modeOption.equals("Drunk")) {
-					descriptionLabel
-							.setText("<html>Drunk: Alcohol tends to slow your reactions down..."); // description
-																									// of
-																									// the
-																									// mode
-				} else if (modeOption.equals("Christmas")) {
-					descriptionLabel
-							.setText("<html>Christmas: 'Snow is falling... <br>all around you...'</html>"); // description
+					descriptionLabel.setText("<html>Drunk: Alcohol tends to slow your reactions down..."); // description
 																											// of
 																											// the
 																											// mode
+				} else if (modeOption.equals("Christmas")) {
+					descriptionLabel.setText("<html>Christmas: 'Snow is falling... <br>all around you...'</html>"); // description
+																													// of
+																													// the
+																													// mode
 				} else if (modeOption.equals("Easter")) {
-					descriptionLabel
-							.setText("<html>Easter: Hopping is the new bouncing!"); // description
-																					// of
-																					// the
-																					// mode
+					descriptionLabel.setText("<html>Easter: Hopping is the new bouncing!"); // description
+																							// of
+																							// the
+																							// mode
 				}
 			}
 
@@ -843,23 +844,19 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			public void itemStateChanged(ItemEvent e) {
 				difficultyOption = (String) e.getItem();
 				if (difficultyOption.equals("Very Easy")) {
-					descriptionLabel
-							.setText("<html>Very Easy: Come on, you can't be THAT bad?");
+					descriptionLabel.setText("<html>Very Easy: Come on, you can't be THAT bad?");
 				} else if (difficultyOption.equals("Easy")) {
-					descriptionLabel
-							.setText("<html>Easy: For those that don't seek a challenge...");
+					descriptionLabel.setText("<html>Easy: For those that don't seek a challenge...");
 				} else if (difficultyOption.equals("Normal")) {
-					descriptionLabel
-							.setText("<html>Normal: The default difficulty - not too easy, not too hard...");
+					descriptionLabel.setText("<html>Normal: The default difficulty - not too easy, not too hard...");
 				} else if (difficultyOption.equals("Hard")) {
-					descriptionLabel
-							.setText("<html>Hard: For those that seek a challenge...");
+					descriptionLabel.setText("<html>Hard: For those that seek a challenge...");
 				} else if (difficultyOption.equals("Impossible")) {
-					descriptionLabel
-							.setText("<html>Impossible: Okay, it's not exactly impossible, but still ruddy difficult...");
+					descriptionLabel.setText(
+							"<html>Impossible: Okay, it's not exactly impossible, but still ruddy difficult...");
 				} else if (difficultyOption.equals("Don't even try")) {
-					descriptionLabel
-							.setText("<html>Don't even try: Get a point on this and I'll personally give you a medal...");
+					descriptionLabel.setText(
+							"<html>Don't even try: Get a point on this and I'll personally give you a medal...");
 				}
 
 			}
@@ -894,6 +891,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				modeOption = (String) modeBox.getSelectedItem();
 
 				setPipeGap();
+				System.out.println("Gap set: " + pipeGap);
 
 				try {
 					Writer optionsWriter = new FileWriter("Options.txt");
@@ -982,8 +980,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			}
 
 			if (c == KeyEvent.VK_Q) {
-				int choice = JOptionPane.showConfirmDialog(null,
-						"Are you sure you want to quit?", "Are you sure?",
+				int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want to quit?", "Are you sure?",
 						JOptionPane.YES_NO_OPTION);
 				if (choice == JOptionPane.YES_OPTION) {
 					System.exit(0);
@@ -1031,8 +1028,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				clearIntersectPoint = 640;
 			}
 			if (c == KeyEvent.VK_ESCAPE) { // close the program
-				int choice = JOptionPane.showConfirmDialog(null,
-						"Are you sure you want to quit?", "Are you sure?",
+				int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want to quit?", "Are you sure?",
 						JOptionPane.YES_NO_OPTION);
 				if (choice == JOptionPane.YES_OPTION) {
 					System.exit(0);
@@ -1040,8 +1036,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			}
 
 			if (c == KeyEvent.VK_L) { // shows online top scorer
-				JOptionPane.showMessageDialog(Frame.frame, worldBestScore,
-						"Top scorer", JOptionPane.PLAIN_MESSAGE);
+				JOptionPane.showMessageDialog(Frame.frame, worldBestScore, "Top scorer", JOptionPane.PLAIN_MESSAGE);
 			}
 
 			if (c == KeyEvent.VK_O) { // display options menu
