@@ -78,7 +78,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int[] treeX3 = { 30, 75, 120 };
 	int[] treeY3 = { 610, 550, 610 };
 	int[] pipeYSpeed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-	int[] allScores = new int[5];
+	int[] allHighScores = new int[6];
+	int iDiff;
 
 	double cloudX = 20.0;
 	double cloudY = random.nextInt(100) + 40;
@@ -88,6 +89,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	double cloudSpeed = 0.3;
 	double pipeSpeed = -2.0;
 	double snowSpeed = 0.4;
+	double snoopX = 1600;
+	double snoopY = 500;
 	double[] starsX = new double[200];
 	double[] starsY = new double[200];
 	double[] snowX = new double[100];
@@ -111,7 +114,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	String difficultyOption;
 	String colourOption;
 	String modeOption = "Normal";
-	String scoreString;
+	String[] scoreStrings = new String[6];
 	String[] difficulty = { "Very Easy", "Easy", "Normal", "Hard",
 			"Impossible", "Don't even try" };
 	String[] boxColour = { "Black", "Blue", "Green", "Grey", "Orange", "Pink",
@@ -209,7 +212,6 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			highScoreReader.close();
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			highScore = 0;
 		}
 
@@ -327,6 +329,13 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		if (gameStarted) { // display box and score
 			setColour(g);
+
+			if (modeOption.equals("High")) {
+				Image image = ((ImageIcon) snoop).getImage();
+				g.drawImage(image, (int) snoopX, (int) snoopY, 100, 200, this);
+
+			}
+
 			if (!(modeOption.equals("Christmas"))) {
 				g.fillRect(box.x, box.y, box.width, box.height);
 			} else {
@@ -337,12 +346,6 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				} catch (IOException e) {
 
 				}
-			}
-
-			if (modeOption.equals("High")) {
-				Image image = ((ImageIcon) snoop).getImage();
-				g.drawImage(image, 10, 500, 100, 200, this);
-
 			}
 
 			g.setColor(Color.RED);
@@ -373,18 +376,61 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 			onlineCheck();
 
-			if (highScore < score) { // if new high score is achieved
-				highScore = score;
+			if (allHighScores[iDiff] < score) { // if new high score is achieved
+				allHighScores[iDiff] = score;
+
+				System.out.println("High score on that difficulty");
 
 				try { // save high score to HScore.txt
 
-					scoreString = Integer.toString(highScore);
-					System.out.println("New high score: " + scoreString);
+					scoreStrings[iDiff] = Integer
+							.toString(allHighScores[iDiff]);
 
-					Writer highScoreWriter = new FileWriter("HScore.txt");
-					highScoreWriter.write(scoreString);
-					System.out.println("Saved high score: " + scoreString);
-					highScoreWriter.close();
+					System.out.println("New high score: "
+							+ allHighScores[iDiff]);
+
+					Writer highScoreWriter;
+
+					switch (allHighScores[iDiff]) {
+						case 0:
+							highScoreWriter = new FileWriter("Very Easy.txt");
+							highScoreWriter.write(scoreStrings[iDiff]);
+							System.out.println("Saved high score: " + scoreStrings);
+							highScoreWriter.close();
+							break;
+						case 1:
+							highScoreWriter = new FileWriter("Easy.txt");
+							highScoreWriter.write(scoreStrings[iDiff]);
+							System.out.println("Saved high score: " + scoreStrings);
+							highScoreWriter.close();
+							break;
+						case 2:
+							highScoreWriter = new FileWriter("Normal.txt");
+							highScoreWriter.write(scoreStrings[iDiff]);
+							System.out.println("Saved high score: " + scoreStrings);
+							highScoreWriter.close();
+							break;
+						case 3:
+							highScoreWriter = new FileWriter("Hard.txt");
+							highScoreWriter.write(scoreStrings[iDiff]);
+							System.out.println("Saved high score: " + scoreStrings);
+							highScoreWriter.close();
+							break;
+						case 4:
+							highScoreWriter = new FileWriter("Impossible.txt");
+							highScoreWriter.write(scoreStrings[iDiff]);
+							System.out.println("Saved high score: " + scoreStrings);
+							highScoreWriter.close();
+							break;
+						case 5:
+							highScoreWriter = new FileWriter("Don't even try.txt");
+							highScoreWriter.write(scoreStrings[iDiff]);
+							System.out.println("Saved high score: " + scoreStrings);
+							highScoreWriter.close();
+							break;
+					}
+
+					
 
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -397,8 +443,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial", Font.PLAIN, 45));
 			g.drawString("You lose!", 545, 250);
-			g.drawString("Local High Score: " + Integer.toString(highScore),
-					450, 300);
+			g.drawString(
+					"Local High Score: "
+							+ Integer.toString(allHighScores[iDiff]), 450, 300);
 			g.drawString("Press enter to retry or esc to exit", 323, 350);
 			g.drawString("Press L to reveal the top scorer", 335, 400);
 			g.drawString("Press O to view options", 402, 450);
@@ -527,6 +574,12 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		yVelocity += gravity; // make the box speed up
 
+		snoopX -= 1.5;
+
+		if (snoopX <= -100) {
+			snoopX = 1400;
+		}
+
 		if (yVelocity >= terminalVelocity) {
 			yVelocity = terminalVelocity;
 		}
@@ -599,8 +652,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			cloudX = 164.79999999999868;
 		}
 
-		if ("Impossible".equals(difficultyOption)) { 
-														
+		if ("Impossible".equals(difficultyOption)) {
+
 			for (int i = 0; i < 10; i += 2) {
 				if (pipeY[i] <= -490 || pipeY[i] >= 0) {
 					pipeYSpeed[i] *= -1;
@@ -614,11 +667,11 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			}
 
 		}
-		
+
 		if ("Don't even try".equals(difficultyOption)) {
-			
+
 			pipeSpeed = -2.0;
-			
+
 			for (int i = 0; i <= 4; i++) {
 				pipeX[i] += pipeSpeed;
 			}
@@ -631,7 +684,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 					pipeYSpeed[i + 1] *= -1;
 					pipeY[i] += pipeYSpeed[i];
 					pipeY[i + 1] += pipeYSpeed[i + 1];
-					
+
 				}
 
 				pipeY[i] += pipeYSpeed[i];
@@ -883,22 +936,28 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		switch (difficultyOption) {
 		case "Very Easy":
 			pipeGap = 680;
+			iDiff = 0;
 			break;
 		case "Easy":
 			pipeGap = 650;
+			iDiff = 1;
 			break;
 		case "Normal":
 			pipeGap = 635;
+			iDiff = 2;
 			break;
 		case "Hard":
 			pipeGap = 620;
+			iDiff = 3;
 			break;
 		case "Impossible":
 			pipeGap = 610;
+			iDiff = 4;
 			break;
 		case "Don't even try":
 			pipeGap = 590;
-		break;
+			iDiff = 5;
+			break;
 		}
 	}
 
@@ -956,6 +1015,9 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				yVelocity = 0;
 				yPosition = 0;
 				pipeX[0] = 1280;
+
+				setPipeGap();
+
 				for (int i = 1; i <= 4; i++) {
 					pipeX[i] = pipeX[i - 1] + 300;
 				}

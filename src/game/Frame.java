@@ -1,7 +1,5 @@
 package game;
 
-import javax.swing.JFrame;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -9,6 +7,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.parse4j.Parse;
