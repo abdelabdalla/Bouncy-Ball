@@ -69,14 +69,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	int highScore;
 	int onlineScore;
 	int treeX = 80;
-	int treeY = 460;
+	int treeY = 500;
 	int twinkle;
-	int[] treeX1 = { 60, 75, 90 };
-	int[] treeY1 = { 520, 460, 520 };
-	int[] treeX2 = { 45, 75, 105 };
-	int[] treeY2 = { 565, 505, 565 };
-	int[] treeX3 = { 30, 75, 120 };
-	int[] treeY3 = { 610, 550, 610 };
 	int[] pipeYSpeed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 	int[] allHighScores = new int[6];
 	int iDiff;
@@ -311,6 +305,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			g.fillOval(158, 42, 150, 150);
 
 		}
+		
+		//TODO paintTrees
+		g.setColor(new Color(110, 58, 0));
+		paintTrees(g, treeX, treeY);
 
 		g.setColor(cloudColour);
 		if ("Christmas".equals(modeOption)) { // set the theme when Christmas
@@ -510,11 +508,19 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 																			// cloud
 		g.fillOval((int) cloudX2 - 10, (int) cloudY2 - 42, 140, 55);
 		g.fillOval((int) cloudX2 + 30, (int) (cloudY2 - 70), 150, 65);
-		g.fillOval((int) cloudX2 - 32, (int) (cloudY2 - 80), 150, 70);
+		g.fillOval((int) cloudX2 - 32, (int) (cloudY2 - 80), 150, 70); // Top right oval?
+		g.fillOval((int) cloudX2 + 78, (int) cloudY2 - 74, 80, 30);
+		g.fillOval((int) cloudX2 + 80, (int) cloudY2 - 44, 80, 50);
 
 	}
 
-	public void paintTrees(Graphics g, int treeX, int treeY) {
+	public void paintTrees(Graphics g, int treeX2, int treeY2) { //TODO TREES V2.0
+		
+		g.fillRect(treeX2, treeY2, 30, 200);
+		g.setColor(pipeColour);
+		g.fillOval(treeX2 + 5, treeY2 - 30, 50, 50);
+		g.fillOval(treeX2 - 35, treeY2 - 10, 50, 50);
+		g.fillOval(treeX2 - 42, treeY2 - 28, 50, 50);
 
 	}
 
