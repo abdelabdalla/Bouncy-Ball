@@ -524,6 +524,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		ParseObject object = new ParseObject("Scores");
 		object.put("User", playerName);
 		object.put("Score", s1);
+		object.put("Difficulty",iDiff);
 		object.saveInBackground(); // save score
 
 		ParseQuery<ParseObject> q = ParseQuery.getQuery("Scores"); // Tests if
@@ -531,7 +532,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 																	// high
 																	// score
 
-		q.getInBackground("PseztczTNY", new GetCallback<ParseObject>() {
+		q.getInBackground("kdSoMFNnio", new GetCallback<ParseObject>() {
 
 			@Override
 			public void done(ParseObject pObject, ParseException e) {
@@ -910,6 +911,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				}
 
 				optionsFrame.setVisible(false);
+				
+				snoopX = 1600;
 
 			}
 
