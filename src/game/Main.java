@@ -96,7 +96,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 	
 	Pipe object = new Pipe(pipeX[1], pipeY[1]);
 
-	File pointSFX = new File("Cleared.wav");
+	File pointSFX = new File("res/sounds/Cleared.wav");
 
 	String playerName;
 	String worldBestScore;

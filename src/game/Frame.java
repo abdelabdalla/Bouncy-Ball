@@ -19,7 +19,7 @@ public class Frame {
 	static Main panel;
 	
 	public static void main(String[] args) {
-		ImageIcon img = new ImageIcon("Icon.png"); // Imports an icon image for the taskbar and stuff
+		ImageIcon img = new ImageIcon("res/drawable/icon.png"); // Imports an icon image for the taskbar and stuff
 		String name;
 		
 		try {
