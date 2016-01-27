@@ -351,7 +351,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		g.setColor(pipeColour);
 		for (Rectangle p : pipe) { // draw pipes
-			g.fillRect(p.x, p.y, p.width, p.height);
+			g.fill3DRect(p.x, p.y, p.width, p.height,true); //TODO see if 3d is better
 		}
 
 		if (gameStarted) { // display box and score
@@ -364,7 +364,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 			}
 
 			if (!(modeOption.equals("Christmas"))) {
-				g.fillRect(box.x, box.y, box.width, box.height);
+				g.fill3DRect(box.x, box.y, box.width, box.height,true);//TODO 3d
 			} else {
 				try {
 					BufferedImage image = ImageIO.read(new File(
