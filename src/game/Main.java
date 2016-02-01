@@ -71,7 +71,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 	int treeY = 550;
 	int twinkle;
-	int[] pipeYSpeed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+	int[] pipeYSpeed1 = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+	int[] pipeYSpeed2 = { 7, 7, 7, 7, 7, 7, 7, 7, 7, 7 };
 	int[] allHighScores = new int[6];
 	int iDiff;
 
@@ -276,7 +277,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
 				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		super.paintComponent(g2d);
-
+		
 		for (int i = 0; i < 10; i += 2) {// initialise pipe y axis
 			setPipeGap();
 			while (pipeY[i] < -500) {
@@ -319,8 +320,6 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		}
 
-		// TODO paintTrees
-
 		for (int i = 0; i < 3000; i += 500) {
 			paintTrees(g, (int) treeX, treeY);
 			paintTrees(g, (int) treeX + i, treeY);
@@ -361,6 +360,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 		if (gameStarted) { // display box and score
 			setColour(g);
+			setPipeGap();
 
 			if (modeOption.equals("High")) { // Welcome Snoop Dogg to the team!
 				Image image = ((ImageIcon) snoop).getImage();
@@ -409,6 +409,8 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		if (gameOver) { // at game end
 
 			onlineCheck();
+			
+			snoopX = 1600;
 
 			if (allHighScores[iDiff] < score) { // if new high score is achieved
 				allHighScores[iDiff] = score;
@@ -569,6 +571,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		g.fillOval(treeX2 - 35, treeY2 - 10, 50, 50);
 		g.fillOval(treeX2 - 42, treeY2 - 28, 50, 50);
 		g.fillOval(treeX2 - 12, treeY2 - 58, 50, 50);
+		g.fillOval(treeX2, treeY2 - 8, 50, 50);
 
 	}
 
@@ -652,7 +655,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 									// the pipe
 			score++;
 			pointAward += 300;
-			// soundEffect();
+			soundEffect();
 		}
 
 		if (delay) { // slows everything down when drunk mode is selected
@@ -721,21 +724,21 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 
 			for (int i = 0; i < 10; i += 2) {
 				if (pipeY[i] <= -490) {
-					pipeYSpeed[i] = 1;
-					pipeYSpeed[i + 1] = 1;
-					pipeY[i] += pipeYSpeed[i];
-					pipeY[i + 1] += pipeYSpeed[i + 1];
+					pipeYSpeed1[i] = 1;
+					pipeYSpeed1[i + 1] = 1;
+					pipeY[i] += pipeYSpeed1[i];
+					pipeY[i + 1] += pipeYSpeed1[i + 1];
 				}
 
 				if (pipeY[i] >= 0) {
-					pipeYSpeed[i] = -1;
-					pipeYSpeed[i + 1] = -1;
-					pipeY[i] += pipeYSpeed[i];
-					pipeY[i + 1] += pipeYSpeed[i + 1];
+					pipeYSpeed1[i] = -1;
+					pipeYSpeed1[i + 1] = -1;
+					pipeY[i] += pipeYSpeed1[i];
+					pipeY[i + 1] += pipeYSpeed1[i + 1];
 				}
 
-				pipeY[i] += pipeYSpeed[i];
-				pipeY[i + 1] += pipeYSpeed[i + 1];
+				pipeY[i] += pipeYSpeed1[i];
+				pipeY[i + 1] += pipeYSpeed1[i + 1];
 			}
 
 		}
@@ -743,8 +746,26 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 		if ("Don't even try".equals(difficultyOption)) { // TODO Faster moving
 															// pipes
 
+			
+			
 			for (int i = 0; i < 10; i += 2) {
+			
+				if (pipeY[i] <= -490) {
+					pipeYSpeed2[i] = 7;
+					pipeYSpeed2[i + 1] = 7;
+					pipeY[i] += pipeYSpeed2[i];
+					pipeY[i + 1] += pipeYSpeed2[i + 1];
+				}
 
+				if (pipeY[i] >= 0) {
+					pipeYSpeed2[i] = -7;
+					pipeYSpeed2[i + 1] = -7;
+					pipeY[i] += pipeYSpeed2[i];
+					pipeY[i + 1] += pipeYSpeed2[i + 1];
+				}
+
+				pipeY[i] += pipeYSpeed2[i];
+				pipeY[i + 1] += pipeYSpeed2[i + 1];
 			}
 
 		}
@@ -805,7 +826,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 				}
 			}
 
-		}).start();
+		}).start(); 
 	}
 
 	public void setColour(Graphics g) { // sets the colour of the box
@@ -1094,7 +1115,6 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 														// game
 			// animations
 			timer.start();
-			setPipeGap();
 			gameStarted = true;
 
 		}

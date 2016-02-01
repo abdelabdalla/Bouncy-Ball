@@ -1,7 +1,5 @@
 package game;
 
-import javax.swing.JFrame;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -9,6 +7,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.parse4j.Parse;
@@ -19,7 +18,7 @@ public class Frame {
 	static Main panel;
 	
 	public static void main(String[] args) {
-		ImageIcon img = new ImageIcon("Icon.png"); // Imports an icon image for the taskbar and stuff
+		ImageIcon img = new ImageIcon("res/drawable/icon.png"); // Imports an icon image for the taskbar and stuff
 		String name;
 		
 		try {
